@@ -12,6 +12,7 @@ const NAV = [
   { href: "/dashboard/buy", label: "Buy from admin", icon: StoreIcon },
   { href: "/dashboard/cart", label: "Cart", icon: CartIcon },
   { href: "/dashboard/orders", label: "My purchases", icon: OrdersIcon },
+  { href: "/dashboard/inventory", label: "My inventory", icon: StackIcon },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -119,6 +120,18 @@ function CartIcon({ className }: { className?: string }) {
       <circle cx="9.5" cy="20" r="1.2" />
       <circle cx="17.5" cy="20" r="1.2" />
       <path d="M3 4h2l2.2 11.1a1.5 1.5 0 0 0 1.47 1.2H18a1.5 1.5 0 0 0 1.47-1.19L21 8H6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function StackIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+      <path
+        d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z M3.5 12 12 16.5 20.5 12 M3.5 16 12 20.5 20.5 16"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

@@ -96,6 +96,34 @@ export interface StockItemView {
   lowStockAt: number | null;
 }
 
+export interface StockLedgerEntry {
+  id: string;
+  delta: number;
+  onHandAfter: number;
+  reservedAfter: number;
+  reason: string;
+  refType: string | null;
+  refId: string | null;
+  unitCost: string | null;
+  batchNo: string | null;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface UpdateStockItemBody {
+  sellPrice?: string;
+  discountPrice?: string;
+  taxRatePct?: string;
+  isListed?: boolean;
+  lowStockAt?: number;
+}
+
+export interface AdjustStockBody {
+  delta: number;
+  reason: "ADJUSTMENT" | "DAMAGE" | "RETURN_IN";
+  note?: string;
+}
+
 // --- Cart (from API.md · Cart Phase 4) ---
 
 export interface CartLine {
