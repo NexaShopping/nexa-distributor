@@ -64,3 +64,116 @@ export interface OtpVerifyResponse {
 export interface MeResponse {
   account: AuthAccount;
 }
+
+export interface AccountSummary {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  avatarUrl: string | null;
+  role: Role;
+  status: AccountStatus;
+}
+
+// --- Inventory / storefront browsing (from API.md · GET /inventory?sellerAccountId=) ---
+
+export interface StockItemView {
+  id: string;
+  variant: {
+    id: string;
+    sku: string;
+    name: string;
+    mrp: string;
+    product: { id: string; name: string; slug: string; brand: string };
+  };
+  onHand: number;
+  reserved: number;
+  available: number;
+  sellPrice: string;
+  discountPrice: string | null;
+  taxRatePct: string;
+  isListed: boolean;
+  lowStockAt: number | null;
+}
+
+// --- Cart (from API.md · Cart Phase 4) ---
+
+export interface CartLine {
+  id: string;
+  variantId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  unitPrice: string;
+  discountAmount: string;
+  taxAmount: string;
+  lineTotal: string;
+  available: number;
+}
+
+export interface CartView {
+  id: string | null;
+  sellerAccountId: string;
+  status: "ACTIVE";
+  items: CartLine[];
+  subtotal: string;
+  discountTotal: string;
+  taxTotal: string;
+  shippingTotal: string;
+  grandTotal: string;
+}
+
+// --- Orders (from API.md · Cart & Orders Phase 4) ---
+
+export type OrderStatus = "AWAITING_PAYMENT" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+export type OrderChannel = "WEB" | "APP" | "DISTRIBUTOR_ASSISTED";
+
+export interface OrderAddress {
+  contactName: string;
+  contactPhone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country?: string;
+}
+
+export interface OrderItemView {
+  id: string;
+  sku: string;
+  productName: string;
+  variantLabel: string;
+  unitPrice: string;
+  quantity: number;
+  discount: string;
+  taxRatePct: string;
+  taxAmount: string;
+  lineTotal: string;
+}
+
+export interface Order {
+  id: string;
+  orderNo: string;
+  buyerAccountId: string;
+  sellerAccountId: string;
+  channel: OrderChannel;
+  status: OrderStatus;
+  paymentStatus: "UNPAID";
+  fulfilmentStatus: "PENDING" | "SHIPPED" | "DELIVERED";
+  subtotal: string;
+  discountTotal: string;
+  taxTotal: string;
+  shippingTotal: string;
+  grandTotal: string;
+  currency: string;
+  shippingAddress: OrderAddress;
+  billingAddress: OrderAddress;
+  items: OrderItemView[];
+  placedAt: string;
+  confirmedAt: string | null;
+  shippedAt: string | null;
+  deliveredAt: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+}
