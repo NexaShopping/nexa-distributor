@@ -1,0 +1,66 @@
+// Response types, hand-written from nexa-docs/docs/API.md. This is the ONLY place API
+// response types live in this repo. Adding a field is safe; a rename/removal in API.md means
+// updating it here too.
+
+export interface PageMeta {
+  cursor?: string;
+  hasMore: boolean;
+}
+
+export interface ApiSuccess<T> {
+  success: true;
+  data: T;
+  meta?: PageMeta;
+}
+
+// Stable SCREAMING_SNAKE codes from API.md. Panels switch on `code`, never on `message`.
+export type ApiErrorCode =
+  | "VALIDATION_FAILED"
+  | "UNAUTHENTICATED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "BUSINESS_RULE_FAILED"
+  | "RATE_LIMITED"
+  | "INTERNAL"
+  | "EXTERNAL_SERVICE_ERROR"
+  // tolerate codes added server-side before this file catches up
+  | (string & {});
+
+export interface ApiErrorPayload {
+  code: ApiErrorCode;
+  message: string;
+  details?: unknown;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: ApiErrorPayload;
+}
+
+export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
+
+// --- Auth (from API.md · POST /auth/otp/request, POST /auth/otp/verify, GET /auth/me) ---
+
+export type Role = "ADMIN" | "COADMIN" | "DISTRIBUTOR" | "CUSTOMER";
+export type AccountStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "CLOSED";
+
+export interface AuthAccount {
+  id: string;
+  email: string | null;
+  phone: string | null;
+  name: string | null;
+  avatarUrl: string | null;
+  role: Role;
+  status: AccountStatus;
+}
+
+export interface OtpVerifyResponse {
+  token: string;
+  expiresAt: string;
+  account: AuthAccount;
+}
+
+export interface MeResponse {
+  account: AuthAccount;
+}
