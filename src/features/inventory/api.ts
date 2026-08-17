@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { AdjustStockBody, StockItemView, StockLedgerEntry, UpdateStockItemBody } from "@/lib/types";
+import type {
+  AdjustStockBody,
+  RetailPriceRange,
+  StockItemView,
+  StockLedgerEntry,
+  UpdateStockItemBody,
+} from "@/lib/types";
 
 // Typed wrappers over src/lib/api.ts + the TanStack Query hooks "my inventory" uses.
 // No receive/transfer here — a distributor's stock only arrives by buying from admin
@@ -35,6 +41,14 @@ export function useUpdateStockItem(id: string) {
   return useMutation({
     mutationFn: (body: UpdateStockItemBody) => api.patch<{ item: StockItemView }>(`/inventory/${id}`, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-inventory"] }),
+  });
+}
+
+export function useRetailPriceRange(id: string) {
+  return useQuery({
+    queryKey: ["retail-price-range", id],
+    queryFn: () => api.get<{ range: RetailPriceRange }>(`/inventory/${id}/retail-range`),
+    enabled: Boolean(id),
   });
 }
 

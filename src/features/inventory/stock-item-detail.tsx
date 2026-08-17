@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useAdjustStock, useLedger, useUpdateStockItem } from "@/features/inventory/api";
+import { useAdjustStock, useLedger, useRetailPriceRange, useUpdateStockItem } from "@/features/inventory/api";
 import { ApiError } from "@/lib/api";
 import { Button, Card, Input, Label, Select, Spinner } from "@/components/ui";
 import type { AdjustStockBody, StockItemView } from "@/lib/types";
+import { formatMoney } from "@/lib/money";
 
 export function StockItemDetail({ item, onClose }: { item: StockItemView; onClose: () => void }) {
   return (
@@ -46,6 +47,7 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
 
 function PricingForm({ item }: { item: StockItemView }) {
   const update = useUpdateStockItem(item.id);
+  const retailRange = useRetailPriceRange(item.id);
   const [sellPrice, setSellPrice] = useState(item.sellPrice);
   const [discountPrice, setDiscountPrice] = useState(item.discountPrice ?? "");
   const [lowStockAt, setLowStockAt] = useState(item.lowStockAt?.toString() ?? "");
@@ -54,10 +56,21 @@ function PricingForm({ item }: { item: StockItemView }) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const range = retailRange.data?.range;
+    if (range) {
+      const minimum = Number(range.minimumRetailPrice);
+      const maximum = Number(range.maximumRetailPrice);
+      const selling = Number(sellPrice);
+      const discounted = discountPrice ? Number(discountPrice) : null;
+      if (selling < minimum || selling > maximum || (discounted !== null && (discounted < minimum || discounted > maximum))) {
+        setError(`Customer prices must stay between ${formatMoney(range.minimumRetailPrice)} and ${formatMoney(range.maximumRetailPrice)}.`);
+        return;
+      }
+    }
     try {
       await update.mutateAsync({
         sellPrice,
-        discountPrice: discountPrice || undefined,
+        discountPrice: discountPrice || null,
         lowStockAt: lowStockAt ? Number(lowStockAt) : undefined,
       });
     } catch (err) {
@@ -89,15 +102,27 @@ function PricingForm({ item }: { item: StockItemView }) {
         </button>
       </div>
       <p className="text-xs text-ink-soft">
-        Listing this puts it in front of your own customers once assisted orders are built.
+        Your price is used for customers attributed to you. Admin pricing remains the fallback when you cannot fulfil the complete cart.
       </p>
+      {retailRange.isLoading && <p className="text-xs text-ink-soft">Loading the allowed customer price range…</p>}
+      {retailRange.data && (
+        <p className="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
+          Allowed customer price: {formatMoney(retailRange.data.range.minimumRetailPrice)}–
+          {formatMoney(retailRange.data.range.maximumRetailPrice)}. MRP: {formatMoney(retailRange.data.range.mrp)}.
+        </p>
+      )}
+      {retailRange.error && (
+        <p className="text-xs text-red-600">
+          {retailRange.error instanceof Error ? retailRange.error.message : "Could not load the allowed retail range"}
+        </p>
+      )}
       <form onSubmit={save} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div>
-          <Label>Sell price (₹)</Label>
+          <Label>Customer sell price (₹)</Label>
           <Input value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} />
         </div>
         <div>
-          <Label>Discount price</Label>
+          <Label>Customer discount price</Label>
           <Input value={discountPrice} onChange={(e) => setDiscountPrice(e.target.value)} />
         </div>
         <div>
@@ -106,7 +131,7 @@ function PricingForm({ item }: { item: StockItemView }) {
         </div>
         {error && <p className="col-span-full text-sm text-red-600">{error}</p>}
         <div className="col-span-full">
-          <Button type="submit" size="sm" disabled={update.isPending}>
+          <Button type="submit" size="sm" disabled={update.isPending || retailRange.isLoading || !retailRange.data}>
             {update.isPending ? "Saving…" : "Save pricing"}
           </Button>
         </div>

@@ -91,6 +91,8 @@ export interface StockItemView {
   available: number;
   sellPrice: string;
   discountPrice: string | null;
+  minimumRetailPrice: string | null;
+  customerPrice: string | null;
   taxRatePct: string;
   isListed: boolean;
   lowStockAt: number | null;
@@ -112,10 +114,16 @@ export interface StockLedgerEntry {
 
 export interface UpdateStockItemBody {
   sellPrice?: string;
-  discountPrice?: string;
+  discountPrice?: string | null;
   taxRatePct?: string;
   isListed?: boolean;
   lowStockAt?: number;
+}
+
+export interface RetailPriceRange {
+  minimumRetailPrice: string;
+  maximumRetailPrice: string;
+  mrp: string;
 }
 
 export interface AdjustStockBody {
