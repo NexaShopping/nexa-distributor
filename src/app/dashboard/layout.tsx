@@ -14,6 +14,7 @@ const NAV = [
   { href: "/dashboard/orders", label: "My purchases", icon: OrdersIcon },
   { href: "/dashboard/inventory", label: "My inventory", icon: StackIcon },
   { href: "/dashboard/customers", label: "Customers", icon: CustomersIcon },
+  { href: "/dashboard/sales", label: "Customer sales", icon: SalesIcon },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -154,6 +155,14 @@ function CustomersIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
       <circle cx="9" cy="8" r="3" />
       <path d="M3.5 19c.4-3.4 2.2-5.2 5.5-5.2s5.1 1.8 5.5 5.2M16 7.5a2.5 2.5 0 0 1 0 5M16.5 14.5c2.4.4 3.7 1.9 4 4.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function SalesIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+      <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

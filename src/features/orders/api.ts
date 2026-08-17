@@ -94,8 +94,10 @@ export function useCancelOrder(id: string) {
   return useMutation({
     mutationFn: (reason?: string) => api.post<{ order: Order }>(`/orders/${id}/cancel`, { reason }),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["sales"] });
       qc.invalidateQueries({ queryKey: ["orders"] });
       qc.invalidateQueries({ queryKey: ["order", id] });
+      qc.invalidateQueries({ queryKey: ["my-inventory"] });
     },
   });
 }
