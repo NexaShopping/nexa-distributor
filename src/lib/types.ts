@@ -132,6 +132,40 @@ export interface AdjustStockBody {
   note?: string;
 }
 
+export type CustomerAcquisitionSource = "ORGANIC" | "REFERRAL" | "DISTRIBUTOR_ASSISTED";
+export type DistributorCustomerStatus = "ACTIVE" | "BLOCKED";
+
+export interface CustomerRelationship {
+  id: string;
+  customer: {
+    id: string;
+    name: string | null;
+    phone: string | null;
+    status: "ACTIVE" | "SUSPENDED";
+  };
+  displayName: string | null;
+  notes: string | null;
+  status: DistributorCustomerStatus;
+  acquisitionSource: CustomerAcquisitionSource | null;
+  acquiredByAccountId: string | null;
+  acquiredAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCustomerBody {
+  phone: string;
+  name: string;
+  displayName?: string;
+  notes?: string;
+}
+
+export interface UpdateCustomerBody {
+  displayName?: string | null;
+  notes?: string | null;
+  status?: DistributorCustomerStatus;
+}
+
 // --- Cart (from API.md · Cart Phase 4) ---
 
 export interface CartLine {

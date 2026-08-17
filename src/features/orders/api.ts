@@ -22,6 +22,17 @@ export function useOrders(filters: OrderFilters, cursor?: string) {
   });
 }
 
+export function useSales(filters: OrderFilters, cursor?: string) {
+  const params = new URLSearchParams({ role: "seller" });
+  if (filters.status) params.set("status", filters.status);
+  if (cursor) params.set("cursor", cursor);
+  return useQuery({
+    queryKey: ["sales", filters, cursor],
+    queryFn: () => api.getPage<{ orders: Order[] }>(`/orders?${params.toString()}`),
+    placeholderData: (prev) => prev,
+  });
+}
+
 export function useOrder(id: string) {
   return useQuery({
     queryKey: ["order", id],
@@ -32,7 +43,8 @@ export function useOrder(id: string) {
 
 export interface PlaceOrderBody {
   sellerAccountId: string;
-  channel: "WEB";
+  channel: "WEB" | "DISTRIBUTOR_ASSISTED";
+  buyerAccountId?: string;
   shippingAddress: OrderAddress;
 }
 
@@ -46,6 +58,36 @@ export function usePlaceOrder() {
     },
   });
 }
+
+export function usePlaceAssistedOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: PlaceOrderBody & { channel: "DISTRIBUTOR_ASSISTED"; buyerAccountId: string }) =>
+      api.post<{ order: Order }>("/orders", body),
+    onSuccess: (_result, variables) => {
+      qc.invalidateQueries({ queryKey: ["sales"] });
+      qc.invalidateQueries({ queryKey: ["cart", variables.sellerAccountId, variables.buyerAccountId] });
+      qc.invalidateQueries({ queryKey: ["my-inventory"] });
+    },
+  });
+}
+
+function useSellerOrderAction(id: string, action: "confirm" | "ship" | "deliver") {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post<{ order: Order }>(`/orders/${id}/${action}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["sales"] });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+      qc.invalidateQueries({ queryKey: ["order", id] });
+      if (action === "deliver") qc.invalidateQueries({ queryKey: ["my-inventory"] });
+    },
+  });
+}
+
+export const useConfirmOrder = (id: string) => useSellerOrderAction(id, "confirm");
+export const useShipOrder = (id: string) => useSellerOrderAction(id, "ship");
+export const useDeliverOrder = (id: string) => useSellerOrderAction(id, "deliver");
 
 export function useCancelOrder(id: string) {
   const qc = useQueryClient();
