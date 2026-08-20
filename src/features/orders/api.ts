@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Order, OrderAddress, OrderStatus } from "@/lib/types";
+import type { Order, OrderAddress, OrderCheckoutPayment, OrderPaymentStatus, OrderStatus } from "@/lib/types";
 
 // Typed wrappers over src/lib/api.ts + the TanStack Query hooks the orders screens use.
 // A distributor is always the buyer here (buying from admin) — role=buyer is the default and
@@ -44,6 +44,7 @@ export function useOrder(id: string) {
 export interface PlaceOrderBody {
   sellerAccountId: string;
   channel: "WEB" | "DISTRIBUTOR_ASSISTED";
+  paymentMethod?: "PHONEPE" | "CREDIT";
   buyerAccountId?: string;
   shippingAddress: OrderAddress;
 }
@@ -51,11 +52,21 @@ export interface PlaceOrderBody {
 export function usePlaceOrder() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: PlaceOrderBody) => api.post<{ order: Order }>("/orders", body),
+    mutationFn: (body: PlaceOrderBody) => api.post<{ order: Order; payment?: OrderCheckoutPayment }>("/orders", body),
     onSuccess: (_result, variables) => {
       qc.invalidateQueries({ queryKey: ["orders"] });
       qc.invalidateQueries({ queryKey: ["cart", variables.sellerAccountId] });
     },
+  });
+}
+
+export function useOrderPaymentStatus(id: string, enabled = true) {
+  return useQuery({
+    queryKey: ["order-payment", id],
+    queryFn: () => api.get<{ payment: OrderPaymentStatus }>(`/orders/${id}/payment-status`),
+    enabled: enabled && Boolean(id),
+    retry: false,
+    staleTime: 0,
   });
 }
 

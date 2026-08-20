@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useCancelOrder, useOrder } from "@/features/orders/api";
+import { ContinuePhonePePayment } from "@/features/orders/payment-actions";
 import { ApiError } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { Button, Card, ErrorState, Input, Spinner } from "@/components/ui";
@@ -69,7 +70,7 @@ function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>
           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_TONES[order.status]}`}>
             {order.status.toLowerCase().replace("_", " ")}
           </span>
-          {CANCELLABLE.includes(order.status) && !showCancel && (
+          {CANCELLABLE.includes(order.status) && order.paymentMethod !== "PHONEPE" && !showCancel && (
             <Button size="sm" variant="danger" onClick={() => setShowCancel(true)}>
               Cancel order
             </Button>
@@ -96,6 +97,8 @@ function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>
           </form>
         </Card>
       )}
+
+      {order.paymentMethod === "PHONEPE" && order.paymentStatus === "PENDING" && <div className="mt-4"><ContinuePhonePePayment orderId={order.id} /></div>}
 
       {order.status === "CANCELLED" && order.cancelReason && (
         <p className="mt-4 rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink-soft">

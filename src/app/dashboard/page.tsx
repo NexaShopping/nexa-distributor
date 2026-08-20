@@ -57,6 +57,16 @@ export default function DashboardPage() {
           <div><p className="text-sm font-medium">Customer sales</p><p className="text-sm text-ink-soft">Confirm, ship, and deliver customer orders.</p></div>
           <Link href="/dashboard/sales" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">View sales</Link>
         </Card>
+
+        <Card className="flex items-center justify-between p-6">
+          <div><p className="text-sm font-medium">Trade credit</p><p className="text-sm text-ink-soft">Review balance and repay outstanding credit.</p></div>
+          <Link href="/dashboard/credit" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">Open</Link>
+        </Card>
+
+        <Card className="flex items-center justify-between p-6">
+          <div><p className="text-sm font-medium">Settlements</p><p className="text-sm text-ink-soft">Track proceeds from customer sales.</p></div>
+          <Link href="/dashboard/settlements" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">View</Link>
+        </Card>
       </div>
     </div>
   );
