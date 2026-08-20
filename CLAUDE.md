@@ -19,12 +19,11 @@ The distributor panel. Next.js (App Router) → Vercel. Talks to `nexa-server` o
 - Admin and distributor may hold near-identical components — that duplication is accepted
   (ADR-0007). Copy, don't share.
 
-## Auth is phone-OTP, and currently DEMO MODE
+## Auth is phone OTP through Ping4SMS
 Login is `POST /auth/otp/request` → `POST /auth/otp/verify` (see `src/app/login/page.tsx`,
-`src/lib/auth-context.tsx`). The server accepts a fixed demo code (`OTP_DEMO_MODE`, see
-`nexa-server/src/core/config.ts` and `nexa-docs/docs/DECISIONS.md` ADR-0008) instead of real
-SMS — this is temporary until DLT sender registration is verified. Nothing in this repo needs
-to change when that flips; the request/response shapes are already the real ones.
+`src/lib/auth-context.tsx`). The server sends a six-digit code using Ping4SMS's DLT-approved
+transactional template, stores only a hashed five-minute challenge, and consumes it after one
+successful use. See `nexa-docs/docs/DECISIONS.md` ADR-0009.
 
 ## Commands
 ```bash
