@@ -15,6 +15,8 @@ const NAV = [
   { href: "/dashboard/inventory", label: "My inventory", icon: StackIcon },
   { href: "/dashboard/customers", label: "Customers", icon: CustomersIcon },
   { href: "/dashboard/sales", label: "Customer sales", icon: SalesIcon },
+  { href: "/dashboard/credit", label: "Trade credit", icon: CreditIcon },
+  { href: "/dashboard/settlements", label: "Settlements", icon: MoneyIcon },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -165,4 +167,12 @@ function SalesIcon({ className }: { className?: string }) {
       <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
+}
+
+function CreditIcon({ className }: { className?: string }) {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}><rect x="3.5" y="5" width="17" height="14" rx="2" /><path d="M3.5 9h17M8 14h3" strokeLinecap="round" /></svg>;
+}
+
+function MoneyIcon({ className }: { className?: string }) {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}><circle cx="12" cy="12" r="8.5" /><path d="M14.5 9.5c-.5-.7-1.3-1-2.5-1-1.4 0-2.5.7-2.5 1.8 0 2.7 5.5 1.1 5.5 3.9 0 1.1-1.1 1.9-2.8 1.9-1.2 0-2.2-.4-2.8-1.2M12 7v10" strokeLinecap="round" /></svg>;
 }

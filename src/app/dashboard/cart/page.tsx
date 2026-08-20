@@ -143,6 +143,7 @@ function CheckoutForm({ sellerAccountId, onCancel }: { sellerAccountId: string; 
   const router = useRouter();
   const place = usePlaceOrder();
   const [address, setAddress] = useState<OrderAddress>(EMPTY_ADDRESS);
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "PHONEPE" | "CREDIT">("COD");
   const [error, setError] = useState<string | null>(null);
 
   function field<K extends keyof OrderAddress>(key: K) {
@@ -156,8 +157,12 @@ function CheckoutForm({ sellerAccountId, onCancel }: { sellerAccountId: string; 
     e.preventDefault();
     setError(null);
     try {
-      const { order } = await place.mutateAsync({ sellerAccountId, channel: "WEB", shippingAddress: address });
-      router.push(`/dashboard/orders/${order.id}`);
+      const result = await place.mutateAsync({ sellerAccountId, channel: "WEB", ...(paymentMethod === "COD" ? {} : { paymentMethod }), shippingAddress: address });
+      if (result.payment?.redirectUrl) {
+        window.location.assign(result.payment.redirectUrl);
+        return;
+      }
+      router.push(`/dashboard/orders/${result.order.id}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not place the order");
     }
@@ -192,6 +197,15 @@ function CheckoutForm({ sellerAccountId, onCancel }: { sellerAccountId: string; 
         <div>
           <Label>Pincode</Label>
           <Input {...field("pincode")} required />
+        </div>
+        <div className="sm:col-span-2">
+          <Label>Payment method</Label>
+          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as typeof paymentMethod)} className="h-10 w-full rounded-md border border-line bg-surface px-3 text-sm">
+            <option value="COD">Cash on delivery</option>
+            <option value="PHONEPE">PhonePe</option>
+            <option value="CREDIT">Trade credit</option>
+          </select>
+          {paymentMethod === "CREDIT" && <p className="mt-1 text-xs text-ink-soft">The order uses your available trade-credit balance and is due according to your credit terms.</p>}
         </div>
         {error && <p className="text-sm text-red-600 sm:col-span-2">{error}</p>}
         <div className="flex gap-2 sm:col-span-2">
