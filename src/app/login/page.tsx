@@ -34,6 +34,7 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [remember, setRemember] = useState(true);
   const otpInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (status === "authed") router.replace("/dashboard"); }, [status, router]);
@@ -69,6 +70,7 @@ export default function LoginPage() {
             <form onSubmit={handleSendCode} className="login-form">
               <label htmlFor="phone">Mobile number</label>
               <div className="phone-field"><span>+91</span><input id="phone" type="tel" inputMode="numeric" autoComplete="tel-national" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="98765 43210" required /></div>
+              <div className="remember-row"><label><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> <span>Remember me</span></label><span className="help-link">Use mobile OTP</span></div>
               <button type="submit" disabled={busy || phone.length !== 10}>{busy ? "Sending…" : "Send code"}</button>
             </form>
           ) : (
