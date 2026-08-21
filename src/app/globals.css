@@ -56,6 +56,7 @@ body {
 .link-button { border: 0; color: #77736d; background: transparent; font: inherit; font-size: 14px; cursor: pointer; }
 .link-button:hover { color: #f36f13; }
 .login-error { margin: 20px 0 0; padding: 12px 14px; border: 1px solid #f1c8bc; border-radius: 10px; color: #a33d25; background: #fff5f1; font-size: 14px; }
+.login-toast { position: fixed; top: 24px; right: 24px; z-index: 20; display: flex; align-items: center; gap: 10px; max-width: min(420px, calc(100vw - 32px)); padding: 14px 16px; border: 1px solid; border-radius: 12px; background: #fff; box-shadow: 0 14px 35px rgba(31, 27, 20, .16); color: #3a3833; font-size: 14px; font-weight: 550; }.login-toast > span { display: grid; width: 22px; height: 22px; flex: 0 0 auto; place-items: center; border-radius: 50%; color: #fff; font-size: 13px; font-weight: 700; }.login-toast button { margin-left: auto; border: 0; color: #8e8b85; background: transparent; font-size: 20px; line-height: 1; cursor: pointer; }.login-toast.success { border-color: #b9dfbd; }.login-toast.success > span { background: #4ba958; }.login-toast.error { border-color: #f1c8bc; color: #9b3d27; }.login-toast.error > span { background: #d85d3f; }.login-toast.info { border-color: #e9d4b3; }.login-toast.info > span { background: #f36f13; }
 .secure-note { display: flex; justify-content: center; gap: 8px; margin-top: 38px; color: #8e8b85; font-size: 13px; }
 .secure-note span { color: #9b9993; font-size: 18px; line-height: .7; }
 

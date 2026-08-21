@@ -10,14 +10,14 @@ import {
 } from "react";
 import { api } from "./api";
 import { tokenStore } from "./auth-store";
-import type { AuthAccount, MeResponse, OtpVerifyResponse } from "./types";
+import type { AuthAccount, MeResponse, OtpRequestResponse, OtpVerifyResponse } from "./types";
 
 type Status = "loading" | "authed" | "anon";
 
 interface AuthContextValue {
   status: Status;
   account: AuthAccount | null;
-  requestOtp: (phone: string) => Promise<void>;
+  requestOtp: (phone: string) => Promise<boolean>;
   verifyOtp: (phone: string, otp: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -48,7 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const requestOtp = useCallback(async (phone: string) => {
-    await api.post("/auth/otp/request", { phone });
+    const result = await api.post<OtpRequestResponse>("/auth/otp/request", { phone });
+    return result.sent;
   }, []);
 
   const verifyOtp = useCallback(async (phone: string, otp: string) => {

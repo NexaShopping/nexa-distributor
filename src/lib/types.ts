@@ -61,6 +61,11 @@ export interface OtpVerifyResponse {
   account: AuthAccount;
 }
 
+export interface OtpRequestResponse {
+  ok: true;
+  sent: boolean;
+}
+
 export interface MeResponse {
   account: AuthAccount;
 }

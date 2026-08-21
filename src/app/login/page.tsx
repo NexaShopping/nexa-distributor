@@ -34,22 +34,34 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
   const [remember, setRemember] = useState(true);
   const otpInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (status === "authed") router.replace("/dashboard"); }, [status, router]);
   useEffect(() => { if (step === "otp") otpInputRef.current?.focus(); }, [step]);
+  useEffect(() => { if (error) setToast({ type: "error", message: error }); }, [error]);
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setError(null);
-    try { await requestOtp(toE164(phone)); setStep("otp"); }
-    catch (err) { setError(err instanceof ApiError ? err.message : "Could not send the code. Try again."); }
+    try {
+      const sent = await requestOtp(toE164(phone));
+      if (!sent) {
+        const message = "No active distributor account was found for this mobile number.";
+        setError(message); setToast({ type: "error", message }); return;
+      }
+      setStep("otp");
+      setToast({ type: "success", message: "OTP sent successfully. Check your mobile." });
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : "Could not send the code. Try again.";
+      setError(message); setToast({ type: "error", message });
+    }
     finally { setBusy(false); }
   }
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setError(null);
-    try { await verifyOtp(toE164(phone), otp); router.replace("/dashboard"); }
+    try { await verifyOtp(toE164(phone), otp); setToast({ type: "success", message: "Signed in successfully." }); setTimeout(() => router.replace("/dashboard"), 350); }
     catch (err) {
       if (err instanceof ApiError) {
         setError(err.code === "NOT_FOUND" ? "No distributor account found for this phone number." : err.code === "FORBIDDEN" ? "This account isn't active yet — contact NexaShopping support." : err.code === "UNAUTHENTICATED" ? "That code is incorrect." : err.message);
@@ -97,6 +109,7 @@ export default function LoginPage() {
         <div className="stock-card"><span>STOCK VALUE</span><strong>₹18,74,920</strong><div className="sparkline" /></div>
         <div className="hero-footer"><div><BoxIcon /><span><b>Live stock insights</b><small>Track inventory in real time</small></span></div><div><LedgerIcon /><span><b>Transparent ledger</b><small>Every transaction, in one place</small></span></div><div><span className="shield">✓</span><span><b>Secure & trusted</b><small>Bank-grade security</small></span></div></div>
       </section>
+      {toast && <div className={`login-toast ${toast.type}`} role="status" aria-live="polite"><span>{toast.type === "success" ? "✓" : toast.type === "error" ? "!" : "i"}</span>{toast.message}<button type="button" aria-label="Dismiss notification" onClick={() => setToast(null)}>×</button></div>}
     </main>
   );
 }
