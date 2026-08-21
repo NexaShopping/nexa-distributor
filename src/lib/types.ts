@@ -89,7 +89,7 @@ export interface StockItemView {
     sku: string;
     name: string;
     mrp: string;
-    product: { id: string; name: string; slug: string; brand: string };
+    product: { id: string; name: string; slug: string; brand: string; media?: { url: string; alt: string | null }[] };
   };
   onHand: number;
   reserved: number;
