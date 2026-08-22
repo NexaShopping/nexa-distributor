@@ -50,7 +50,7 @@ export function useStartCreditRepayment(accountId: string) {
 export function useCreditRepaymentPaymentStatus(accountId: string, repaymentId: string, enabled = true) {
   return useQuery({
     queryKey: [...creditKey(accountId), "repayment-payment", repaymentId],
-    queryFn: () => api.get<{ payment: { merchantOrderId: string; providerStatus: string; repaymentStatus: string; redirectUrl: string | null; verifiedAt: string | null } }>(`/credit/${accountId}/repayments/${repaymentId}/payment-status`),
+    queryFn: () => api.get<{ payment: { merchantOrderId: string; providerStatus: string; repaymentStatus: string; redirectUrl: string | null; expiresAt: string | null; verifiedAt: string | null } }>(`/credit/${accountId}/repayments/${repaymentId}/payment-status`),
     enabled: enabled && Boolean(accountId) && Boolean(repaymentId),
     retry: false,
     staleTime: 0,

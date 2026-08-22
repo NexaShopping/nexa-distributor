@@ -265,4 +265,4 @@ export interface DistributorPayable { id: string; orderId: string; distributorAc
 export interface DistributorPayout { id: string; distributorAccountId: string; amount: string; method: string; externalReference: string; paidAt: string; createdAt: string; allocations: Array<{ id: string; payableId: string; amount: string; createdAt: string; payable: { orderId: string } }>; }
 
 export interface OrderCheckoutPayment { merchantOrderId: string; status: "PENDING" | "SUCCESS"; redirectUrl: string; }
-export interface OrderPaymentStatus { merchantOrderId: string; providerStatus: "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED"; paymentStatus: "UNPAID" | "PENDING" | "PAID"; orderStatus: OrderStatus; redirectUrl: string | null; verifiedAt: string | null; }
+export interface OrderPaymentStatus { merchantOrderId: string; providerStatus: "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED"; paymentStatus: "UNPAID" | "PENDING" | "PAID"; orderStatus: OrderStatus; redirectUrl: string | null; expiresAt: string | null; verifiedAt: string | null; }
