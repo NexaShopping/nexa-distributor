@@ -31,8 +31,24 @@ export function PhonePePaymentResponse({ merchantOrderId }: { merchantOrderId?: 
   const { status, account } = useAuth();
   const orderPayment = useOrderPaymentStatus(merchantOrderId ?? "", status === "authed" && Boolean(merchantOrderId));
   const creditPayment = useCreditRepaymentPaymentStatus(account?.id ?? "", merchantOrderId ?? "", status === "authed" && Boolean(merchantOrderId));
+  const [pollCount, setPollCount] = useState(0);
   useEffect(() => { if (status === "anon") router.replace("/login"); }, [router, status]);
-  useEffect(() => { if (orderPayment.data && merchantOrderId) router.replace(`/dashboard/orders/${merchantOrderId}`); else if (creditPayment.data && merchantOrderId) router.replace("/dashboard/credit"); }, [creditPayment.data, merchantOrderId, orderPayment.data, router]);
+  const payment = orderPayment.data?.payment ?? creditPayment.data?.payment;
+  const isPending = payment?.providerStatus === "PENDING" || payment?.providerStatus === "CREATED";
+  useEffect(() => {
+    if (!merchantOrderId || !isPending || pollCount >= 10) return;
+    const timer = window.setTimeout(() => {
+      setPollCount((count) => count + 1);
+      void orderPayment.refetch();
+      void creditPayment.refetch();
+    }, 3000);
+    return () => window.clearTimeout(timer);
+  }, [creditPayment.refetch, isPending, merchantOrderId, orderPayment.refetch, pollCount]);
+  useEffect(() => {
+    if (!merchantOrderId || !payment || isPending) return;
+    if (orderPayment.data) router.replace(`/dashboard/orders/${merchantOrderId}`);
+    else if (creditPayment.data) router.replace("/dashboard/credit");
+  }, [creditPayment.data, isPending, merchantOrderId, orderPayment.data, payment, router]);
   if (!merchantOrderId) return <ErrorState message="The PhonePe return URL is missing the order reference." />;
   if (orderPayment.isError && creditPayment.isError) {
     const message = creditPayment.error instanceof Error
@@ -42,5 +58,6 @@ export function PhonePePaymentResponse({ merchantOrderId }: { merchantOrderId?: 
         : "Could not verify the PhonePe payment.";
     return <ErrorState message={message} onRetry={() => { void orderPayment.refetch(); void creditPayment.refetch(); }} />;
   }
+  if (payment && isPending) return <Card className="p-5"><div className="flex items-center gap-3"><Spinner className="h-5 w-5 text-brand" /><div><p className="text-sm font-medium">Payment processing</p><p className="text-sm text-ink-soft">PhonePe has not confirmed this payment yet. We are checking securely with PhonePe.</p></div></div>{payment.redirectUrl?.startsWith("https://") && <Button className="mt-4" onClick={() => window.location.assign(payment.redirectUrl!)}>Reopen PhonePe</Button>}{pollCount >= 10 && <p className="mt-3 text-xs text-ink-soft">Still waiting for confirmation. You can reopen the payment or return later; we will not create a duplicate payment.</p>}</Card>;
   return <Card className="flex items-center gap-3 p-5"><Spinner className="h-5 w-5 text-brand" /><div><p className="text-sm font-medium">Verifying PhonePe payment</p><p className="text-sm text-ink-soft">Please keep this page open while the backend checks the provider result.</p></div></Card>;
 }
