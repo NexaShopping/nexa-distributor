@@ -246,6 +246,19 @@ export interface Order {
   shippingAddress: OrderAddress;
   billingAddress: OrderAddress;
   items: OrderItemView[];
+  payment: {
+    merchantOrderId: string;
+    purpose: "CUSTOMER_ORDER" | "DISTRIBUTOR_ORDER" | "CREDIT_REPAYMENT";
+    amount: string;
+    currency: string;
+    status: "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED";
+    providerReference: string | null;
+    redirectUrl: string | null;
+    expiresAt: string | null;
+    verifiedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
   placedAt: string;
   confirmedAt: string | null;
   shippedAt: string | null;

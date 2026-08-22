@@ -110,6 +110,25 @@ function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>
         </p>
       )}
 
+      {order.payment && (
+        <Card className="mt-4 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-medium">Payment details</p>
+            <span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium text-ink-soft">
+              {order.payment.status.toLowerCase()}
+            </span>
+          </div>
+          <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+            <Row label="Method" value={order.payment.purpose === "DISTRIBUTOR_ORDER" ? "PhonePe" : order.payment.purpose} />
+            <Row label="Amount" value={formatMoney(order.payment.amount)} />
+            <Row label="Merchant order ID" value={order.payment.merchantOrderId} />
+            <Row label="Provider reference" value={order.payment.providerReference ?? "Pending"} />
+            <Row label="Expires" value={order.payment.expiresAt ? new Date(order.payment.expiresAt).toLocaleString() : "Not provided"} />
+            <Row label="Verified" value={order.payment.verifiedAt ? new Date(order.payment.verifiedAt).toLocaleString() : "Not verified"} />
+          </dl>
+        </Card>
+      )}
+
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <Card className="overflow-x-auto p-0">
           <table className="w-full text-sm">
