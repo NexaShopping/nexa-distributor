@@ -34,6 +34,13 @@ export function PhonePePaymentResponse({ merchantOrderId }: { merchantOrderId?: 
   useEffect(() => { if (status === "anon") router.replace("/login"); }, [router, status]);
   useEffect(() => { if (orderPayment.data && merchantOrderId) router.replace(`/dashboard/orders/${merchantOrderId}`); else if (creditPayment.data && merchantOrderId) router.replace("/dashboard/credit"); }, [creditPayment.data, merchantOrderId, orderPayment.data, router]);
   if (!merchantOrderId) return <ErrorState message="The PhonePe return URL is missing the order reference." />;
-  if (orderPayment.isError && creditPayment.isError) return <ErrorState message="Could not verify the PhonePe payment." onRetry={() => { void orderPayment.refetch(); void creditPayment.refetch(); }} />;
+  if (orderPayment.isError && creditPayment.isError) {
+    const message = creditPayment.error instanceof Error
+      ? creditPayment.error.message
+      : orderPayment.error instanceof Error
+        ? orderPayment.error.message
+        : "Could not verify the PhonePe payment.";
+    return <ErrorState message={message} onRetry={() => { void orderPayment.refetch(); void creditPayment.refetch(); }} />;
+  }
   return <Card className="flex items-center gap-3 p-5"><Spinner className="h-5 w-5 text-brand" /><div><p className="text-sm font-medium">Verifying PhonePe payment</p><p className="text-sm text-ink-soft">Please keep this page open while the backend checks the provider result.</p></div></Card>;
 }
