@@ -8,15 +8,13 @@ import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/ui";
 
 const NAV = [
-  { href: "/dashboard", label: "Overview", icon: HomeIcon },
-  { href: "/dashboard/buy", label: "Buy from admin", icon: StoreIcon },
-  { href: "/dashboard/cart", label: "Cart", icon: CartIcon },
-  { href: "/dashboard/orders", label: "My purchases", icon: OrdersIcon },
-  { href: "/dashboard/inventory", label: "My inventory", icon: StackIcon },
+  { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
+  { href: "/dashboard/buy", label: "Products", icon: StoreIcon },
+  { href: "/dashboard/orders", label: "Orders", icon: OrdersIcon },
   { href: "/dashboard/customers", label: "Customers", icon: CustomersIcon },
-  { href: "/dashboard/sales", label: "Customer sales", icon: SalesIcon },
-  { href: "/dashboard/credit", label: "Trade credit", icon: CreditIcon },
-  { href: "/dashboard/settlements", label: "Settlements", icon: MoneyIcon },
+  { href: "/dashboard/settlements", label: "Payouts", icon: MoneyIcon },
+  { href: "/dashboard/sales", label: "Reports", icon: SalesIcon },
+  { href: "/dashboard/credit", label: "Settings", icon: CreditIcon },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -52,6 +50,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Nexa<span className="text-brand">Shopping</span>
           </span>
         </div>
+        <button type="button" className="mx-4 mt-8 mb-5 rounded-lg bg-brand px-4 py-3 font-semibold text-white shadow-sm hover:bg-brand-strong">
+          + <span className="ml-1">New Order</span>
+        </button>
         <nav className="flex-1 space-y-0.5 p-3">
           {NAV.map((item) => {
             const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
