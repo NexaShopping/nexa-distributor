@@ -70,6 +70,25 @@ export function useOrderPaymentStatus(id: string, enabled = true) {
   });
 }
 
+export interface ReturnPaymentStatus {
+  merchantOrderId: string;
+  purpose: "CUSTOMER_ORDER" | "DISTRIBUTOR_ORDER" | "CREDIT_REPAYMENT";
+  providerStatus: "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED";
+  redirectUrl: string | null;
+  expiresAt: string | null;
+  verifiedAt: string | null;
+}
+
+export function useReturnPaymentStatus(merchantOrderId: string, enabled = true) {
+  return useQuery({
+    queryKey: ["return-payment", merchantOrderId],
+    queryFn: () => api.get<{ payment: ReturnPaymentStatus }>(`/payments/${merchantOrderId}/status`),
+    enabled: enabled && Boolean(merchantOrderId),
+    retry: false,
+    staleTime: 0,
+  });
+}
+
 export function usePlaceAssistedOrder() {
   const qc = useQueryClient();
   return useMutation({
