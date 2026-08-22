@@ -98,7 +98,11 @@ function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>
         </Card>
       )}
 
-      {order.paymentMethod === "PHONEPE" && order.paymentStatus === "PENDING" && <div className="mt-4"><ContinuePhonePePayment orderId={order.id} /></div>}
+      {order.paymentMethod === "PHONEPE" && order.status === "AWAITING_PAYMENT" && (
+        <div className="mt-4">
+          <ContinuePhonePePayment orderId={order.id} />
+        </div>
+      )}
 
       {order.status === "CANCELLED" && order.cancelReason && (
         <p className="mt-4 rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink-soft">
