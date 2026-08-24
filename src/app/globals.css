@@ -37,6 +37,16 @@ body {
 * { scrollbar-color: rgba(140,113,100,.45) transparent; scrollbar-width: thin; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 
+/* Page identity now lives in the shared dashboard header. Keep local toolbars focused on the task. */
+.buy-desktop-heading { display: none; }
+.buy-mobile-heading h1 { display: none; }
+.customers-heading > div,
+.inventory-heading > div,
+.orders-heading,
+.reports-heading,
+.settlements-heading,
+.settings-heading { display: none; }
+
 .login-shell {
   height: 100vh;
   min-height: 100svh;

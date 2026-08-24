@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { Spinner } from "@/components/ui";
+import { Button, Spinner } from "@/components/ui";
 import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, Users, Wallet } from "flowbite-react-icons/outline";
 
 const NAV = [
@@ -18,6 +18,24 @@ const NAV = [
   { href: "/dashboard/credit", label: "Settings", icon: Cog },
 ];
 
+function getPageHeader(pathname: string) {
+  if (pathname === "/dashboard") return { title: "Distributor overview", description: "Your inventory, customer sales, and settlement pulse at a glance." };
+  if (pathname.startsWith("/dashboard/buy")) return { title: "Wholesale Catalog", description: "Browse and purchase inventory directly from Nexa central supply." };
+  if (pathname.startsWith("/dashboard/cart")) return { title: "Your cart", description: "Review stock selections before placing your order." };
+  if (pathname.startsWith("/dashboard/inventory/")) return { title: "Inventory details", description: "Review stock, pricing, and availability for this item." };
+  if (pathname.startsWith("/dashboard/inventory")) return { title: "Inventory", description: "Manage your available products and stock." };
+  if (pathname.startsWith("/dashboard/orders/")) return { title: "Purchase details", description: "Review payment, delivery, and order items." };
+  if (pathname.startsWith("/dashboard/orders")) return { title: "My purchases", description: "Everything you’ve bought from admin." };
+  if (pathname.startsWith("/dashboard/customers/") && pathname.endsWith("/sale")) return { title: "Assisted sale", description: "Create a sale for one of your customers." };
+  if (pathname.startsWith("/dashboard/customers/")) return { title: "Customer details", description: "Review customer information and sale history." };
+  if (pathname.startsWith("/dashboard/customers")) return { title: "Customers", description: "Your private customer list and assisted-sale relationships." };
+  if (pathname.startsWith("/dashboard/sales/")) return { title: "Sale details", description: "Review the customer sale and settlement status." };
+  if (pathname.startsWith("/dashboard/sales")) return { title: "Reports & analytics", description: "Track customer sales fulfilled from your inventory." };
+  if (pathname.startsWith("/dashboard/settlements")) return { title: "Settlements", description: "Track customer-sale proceeds released by NexaShopping." };
+  if (pathname.startsWith("/dashboard/credit")) return { title: "Trade credit", description: "Track your balance, due charges, and repayments." };
+  return { title: "Distributor workspace", description: "Manage your NexaShopping account." };
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { status, account, logout } = useAuth();
   const router = useRouter();
@@ -25,6 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const pageHeader = getPageHeader(pathname);
 
   useEffect(() => {
     if (status === "anon") router.replace("/login");
@@ -79,30 +98,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-line bg-surface px-5">
-          <div className="flex items-center gap-2.5 sm:hidden">
+        <header className="flex min-h-16 items-center justify-between gap-4 border-b border-line bg-surface px-4 sm:px-5">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            <div className="flex shrink-0 items-center gap-2.5 sm:hidden">
             <button type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-expanded={mobileMenuOpen} aria-controls="distributor-mobile-nav" className="grid h-9 w-9 place-items-center rounded-lg border border-line text-ink transition-colors hover:bg-canvas">
               <span className="sr-only">{mobileMenuOpen ? "Close navigation" : "Open navigation"}</span>
               {mobileMenuOpen ? <Close className="h-5 w-5" /> : <Bars className="h-5 w-5" />}
             </button>
             <Image src="/logo.png" alt="" width={24} height={23} className="h-6 w-auto" />
-            <span className="font-semibold tracking-tight">
-              Nexa<span className="text-brand">Shopping</span>
-            </span>
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold tracking-tight text-ink sm:text-base">{pageHeader.title}</p>
+              <p className="hidden max-w-2xl truncate text-xs text-ink-soft sm:block">{pageHeader.description}</p>
+            </div>
           </div>
-          <div className="hidden text-sm text-ink-soft sm:block" />
           <div className="flex items-center gap-4">
             <span className="hidden text-sm text-ink-soft sm:inline">
               {account?.name ?? account?.phone}
             </span>
-            <button
-              type="button"
-              onClick={() => setLogoutConfirmOpen(true)}
-              disabled={signingOut}
-              className="rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:bg-canvas disabled:opacity-60"
-            >
+            <Button variant="secondary" size="sm" type="button" onClick={() => setLogoutConfirmOpen(true)} disabled={signingOut}>
               {signingOut ? "Signing out…" : "Log out"}
-            </button>
+            </Button>
           </div>
         </header>
         <>
