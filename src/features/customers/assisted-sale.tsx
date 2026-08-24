@@ -30,7 +30,7 @@ export function AssistedSale({ relationship }: { relationship: CustomerRelations
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div className="assisted-sale-grid grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section>
         <form
           className="mb-4 max-w-sm"
@@ -44,14 +44,14 @@ export function AssistedSale({ relationship }: { relationship: CustomerRelations
         {items.length === 0 ? (
           <EmptyState title="No sellable stock found" hint="List in-stock items from My inventory before starting this sale." />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="assisted-product-grid grid gap-4 sm:grid-cols-2">
             {items.map((item) => <AssistedProduct key={item.id} item={item} sellerAccountId={sellerAccountId} buyerAccountId={buyerAccountId} />)}
           </div>
         )}
       </section>
 
       <aside>
-        <Card className="p-4 lg:sticky lg:top-4">
+        <Card className="assisted-cart p-4 lg:sticky lg:top-4">
           <h2 className="font-semibold">Cart for {relationship.displayName || relationship.customer.name || relationship.customer.phone}</h2>
           {cart.items.length === 0 ? (
             <p className="py-8 text-center text-sm text-ink-soft">Add an item from your stock.</p>
@@ -90,7 +90,7 @@ function AssistedProduct({ item, sellerAccountId, buyerAccountId }: { item: Stoc
     }
   }
   return (
-    <Card className="flex flex-col p-4">
+    <Card className="assisted-product flex flex-col p-4">
       <p className="text-xs uppercase tracking-wide text-ink-soft">{item.variant.product.brand}</p>
       <p className="mt-1 font-medium">{item.variant.product.name}</p>
       <p className="text-xs text-ink-soft">{item.variant.name} · {item.variant.sku}</p>
@@ -109,7 +109,7 @@ function AssistedCartLine({ line, sellerAccountId, buyerAccountId }: { line: Car
   const remove = useRemoveCartItem(sellerAccountId, buyerAccountId);
   const overAvailable = line.quantity > line.available;
   return (
-    <div className="rounded-lg border border-line p-3">
+    <div className="assisted-cart-line rounded-lg border border-line p-3">
       <div className="flex justify-between gap-3">
         <div><p className="text-sm font-medium">{line.name}</p><p className="font-mono text-xs text-ink-soft">{line.sku}</p></div>
         <p className="text-sm font-medium">{formatMoney(line.lineTotal)}</p>
