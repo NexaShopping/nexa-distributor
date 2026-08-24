@@ -56,12 +56,12 @@ function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="order-detail-page mx-auto max-w-3xl">
       <Link href="/dashboard/orders" className="text-sm text-ink-soft hover:text-ink">
         ← Back to my purchases
       </Link>
 
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+      <div className="order-detail-heading mt-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{order.orderNo}</h1>
           <p className="mt-1 text-sm text-ink-soft">Placed {new Date(order.placedAt).toLocaleString()}</p>
@@ -135,7 +135,7 @@ function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>
         </Card>
       }
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="order-detail-content mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <Card className="overflow-x-auto p-0">
           <table className="w-full text-sm">
             <thead className="bg-canvas">

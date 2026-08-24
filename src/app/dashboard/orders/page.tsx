@@ -30,13 +30,13 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div>
+    <div className="orders-page mx-auto max-w-4xl">
+      <div className="orders-heading">
         <h1 className="text-xl font-semibold">My purchases</h1>
         <p className="mt-1 text-sm text-ink-soft">Everything you&apos;ve bought from admin.</p>
       </div>
 
-      <div className="mt-5">
+      <div className="orders-filter mt-5">
         <Select
           className="sm:w-48"
           value={filters.status ?? ""}
@@ -61,7 +61,7 @@ export default function OrdersPage() {
         ) : orders.length === 0 ? (
           <EmptyState title="No purchases yet" hint="Orders you place will show up here." />
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-line">
+          <div className="orders-table overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-canvas">
                 <tr className="text-left text-xs text-ink-soft">
