@@ -101,8 +101,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
           </div>
         </header>
-        {mobileMenuOpen && (
-          <div id="distributor-mobile-nav" className="border-b border-line bg-surface px-4 py-3 shadow-sm sm:hidden">
+        <>
+          <button type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} className={`fixed inset-0 z-40 bg-black/25 transition-opacity sm:hidden ${mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"}`} />
+          <div id="distributor-mobile-nav" className={`fixed inset-y-0 left-0 z-50 w-[min(82vw,320px)] overflow-y-auto border-r border-line bg-surface px-4 py-5 shadow-2xl transition-transform duration-300 ease-out sm:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-2 py-1 text-xl text-ink-soft hover:bg-canvas" aria-label="Close navigation">×</button></div>
             <nav className="grid gap-1">
               {NAV.map((item) => {
                 const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
@@ -111,7 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               })}
             </nav>
           </div>
-        )}
+        </>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
