@@ -5,160 +5,43 @@ import { useState } from "react";
 import { useInventory, type InventoryFilters } from "@/features/inventory/api";
 import { StockItemDetail } from "@/features/inventory/stock-item-detail";
 import { formatMoney } from "@/lib/money";
+import type { StockItemView } from "@/lib/types";
 import { Button, EmptyState, ErrorState, Input, Select, Spinner } from "@/components/ui";
 
 export default function InventoryPage() {
   const [filters, setFilters] = useState<InventoryFilters>({});
   const [qInput, setQInput] = useState("");
   const [cursors, setCursors] = useState<string[]>([]);
-  const cursor = cursors.at(-1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
+  const cursor = cursors.at(-1);
   const { data, isLoading, isError, error, refetch, isFetching } = useInventory(filters, cursor);
   const items = data?.data.items ?? [];
   const meta = data?.meta;
-  const selected = items.find((i) => i.id === selectedId) ?? null;
+  const selected = items.find((item) => item.id === selectedId) ?? null;
+  const inStock = items.filter((item) => item.available > 0).length;
+  const lowStock = items.filter((item) => item.lowStockAt !== null && item.available <= item.lowStockAt).length;
+  const outOfStock = items.filter((item) => item.available <= 0).length;
 
-  function updateFilters(next: Partial<InventoryFilters>) {
-    setCursors([]);
-    setFilters((f) => ({ ...f, ...next }));
-  }
+  function updateFilters(next: Partial<InventoryFilters>) { setCursors([]); setFilters((value) => ({ ...value, ...next })); }
+  function search(event: React.FormEvent) { event.preventDefault(); updateFilters({ q: qInput.trim() || undefined }); }
 
-  function search(e: React.FormEvent) {
-    e.preventDefault();
-    updateFilters({ q: qInput || undefined });
-  }
+  return <div className="inventory-page">
+    <div className="inventory-mobile-head"><div><span>Distributor Portal</span><h1>Inventory</h1></div><button type="button" aria-label="Notifications">♧</button><div className="inventory-avatar">N</div></div>
+    <div className="inventory-heading"><div><div className="inventory-breadcrumb"><Link href="/dashboard">Dashboard</Link><span>›</span><strong>Inventory</strong></div><h1>Inventory</h1><p>Manage your available products and stock.</p></div><button type="button" className="inventory-add">＋ Add Product</button></div>
 
-  return (
-    <div className="mx-auto max-w-6xl">
-      <div>
-        <h1 className="text-xl font-semibold">My inventory</h1>
-        <p className="mt-1 text-sm text-ink-soft">What you&apos;ve bought from admin, priced and listed by you.</p>
-      </div>
+    <div className="inventory-stats"><StatCard label="Total Products" value={items.length} icon="▣" tone="orange" /><StatCard label="In Stock" value={inStock} icon="✓" tone="green" /><StatCard label="Low Stock" value={lowStock} icon="△" tone="yellow" /><StatCard label="Out of Stock" value={outOfStock} icon="!" tone="red" /></div>
+    <div className="inventory-health"><div className="inventory-health-head"><strong>Overall Stock Health</strong><b>{items.length ? Math.round((inStock / items.length) * 100) : 0}% Healthy</b></div><div className="inventory-health-bar"><span style={{ width: `${items.length ? (inStock / items.length) * 100 : 0}%` }} /></div><div className="inventory-controls"><span className="inventory-filter-label">☷ Filters:</span><Select value={filters.isListed === undefined ? "" : String(filters.isListed)} onChange={(event) => updateFilters({ isListed: event.target.value === "" ? undefined : event.target.value === "true" })}><option value="">Stock Status: All</option><option value="true">Listed</option><option value="false">Unlisted</option></Select><Select value={filters.lowStock ? "true" : ""} onChange={(event) => updateFilters({ lowStock: event.target.value === "true" || undefined })}><option value="">Category: All</option><option value="true">Low Stock</option></Select><span className="inventory-sort">Sort by: <select><option>Stock (Low to High)</option><option>Stock (High to Low)</option></select></span></div></div>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <form onSubmit={search} className="flex-1 sm:max-w-xs">
-          <Input placeholder="Search SKU / product…" value={qInput} onChange={(e) => setQInput(e.target.value)} />
-        </form>
-        <Select
-          className="sm:w-40"
-          value={filters.isListed === undefined ? "" : String(filters.isListed)}
-          onChange={(e) => updateFilters({ isListed: e.target.value === "" ? undefined : e.target.value === "true" })}
-        >
-          <option value="">Any listing state</option>
-          <option value="true">Listed</option>
-          <option value="false">Unlisted</option>
-        </Select>
-        <label className="flex items-center gap-2 text-sm text-ink-soft">
-          <input
-            type="checkbox"
-            checked={filters.lowStock ?? false}
-            onChange={(e) => updateFilters({ lowStock: e.target.checked || undefined })}
-            className="h-4 w-4 rounded border-line accent-[var(--brand)]"
-          />
-          Low stock only
-        </label>
-      </div>
+    <div className="inventory-mobile-search"><form onSubmit={search}><Input aria-label="Search inventory" placeholder="Search inventory..." value={qInput} onChange={(event) => setQInput(event.target.value)} /></form></div>
+    <div className="inventory-mobile-chips"><button className="active" type="button" onClick={() => updateFilters({ lowStock: undefined })}>All Items</button><button type="button" onClick={() => updateFilters({ lowStock: true })}>● Low Stock ({lowStock})</button><button type="button" onClick={() => updateFilters({ lowStock: false })}>In Stock</button></div>
 
-      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div>
-          {isLoading ? (
-            <div className="grid place-items-center py-20 text-ink-soft">
-              <Spinner className="h-5 w-5" />
-            </div>
-          ) : isError ? (
-            <ErrorState message={error instanceof Error ? error.message : "Could not load your inventory"} onRetry={refetch} />
-          ) : items.length === 0 ? (
-            <EmptyState
-              title="Nothing in stock yet"
-              hint="Buy something from admin to start building your inventory."
-              action={
-                <Link href="/dashboard/buy">
-                  <Button size="sm">Buy from admin</Button>
-                </Link>
-              }
-            />
-          ) : (
-            <div className="overflow-x-auto rounded-xl border border-line">
-              <table className="w-full text-sm">
-                <thead className="bg-canvas">
-                  <tr className="text-left text-xs text-ink-soft">
-                    <th className="px-4 py-2.5 font-medium">Product / variant</th>
-                    <th className="px-4 py-2.5 font-medium">SKU</th>
-                    <th className="px-4 py-2.5 text-right font-medium">Available</th>
-                    <th className="px-4 py-2.5 text-right font-medium">Sell price</th>
-                    <th className="px-4 py-2.5 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line bg-surface">
-                  {items.map((item) => {
-                    const lowStock = item.lowStockAt !== null && item.available <= item.lowStockAt;
-                    return (
-                      <tr
-                        key={item.id}
-                        onClick={() => setSelectedId(item.id)}
-                        className={`cursor-pointer transition-colors hover:bg-canvas ${
-                          selectedId === item.id ? "bg-brand/5" : ""
-                        }`}
-                      >
-                        <td className="px-4 py-2.5">
-                          <p className="font-medium">{item.variant.product.name}</p>
-                          <p className="text-xs text-ink-soft">{item.variant.name}</p>
-                        </td>
-                        <td className="px-4 py-2.5 font-mono text-xs text-ink-soft">{item.variant.sku}</td>
-                        <td className={`px-4 py-2.5 text-right tabular-nums ${lowStock ? "font-medium text-amber-700" : ""}`}>
-                          {item.available}
-                          {lowStock && " ⚠"}
-                        </td>
-                        <td className="px-4 py-2.5 text-right">{formatMoney(item.sellPrice)}</td>
-                        <td className="px-4 py-2.5">
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                              item.isListed ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-600"
-                            }`}
-                          >
-                            {item.isListed ? "Listed" : "Unlisted"}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {(cursors.length > 0 || meta?.hasMore) && items.length > 0 && (
-            <div className="mt-4 flex justify-center gap-3">
-              {cursors.length > 0 && (
-                <Button variant="secondary" size="sm" onClick={() => setCursors((c) => c.slice(0, -1))}>
-                  Previous
-                </Button>
-              )}
-              {meta?.hasMore && meta.cursor && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={isFetching}
-                  onClick={() => setCursors((c) => [...c, meta.cursor!])}
-                >
-                  {isFetching ? "Loading…" : "Next"}
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div>
-          {selected ? (
-            <StockItemDetail item={selected} onClose={() => setSelectedId(null)} />
-          ) : (
-            <div className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-ink-soft">
-              Select a row to see pricing, adjustments, and its ledger.
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+    <div className="inventory-content"><div className="inventory-list">{isLoading ? <div className="grid place-items-center py-20 text-ink-soft"><Spinner className="h-5 w-5" /></div> : isError ? <ErrorState message={error instanceof Error ? error.message : "Could not load your inventory"} onRetry={refetch} /> : items.length === 0 ? <EmptyState title="Nothing in stock yet" hint="Buy something from admin to start building your inventory." action={<Link href="/dashboard/buy"><Button size="sm">Buy from admin</Button></Link>} /> : <><div className="inventory-table"><div className="inventory-table-head"><span>Product</span><span>SKU</span><span>Category</span><span>Current Stock</span><span>Status</span><span>Price (Wholesale)</span><span>Actions</span></div>{items.map((item) => <InventoryRow key={item.id} item={item} selected={selectedId === item.id} onSelect={() => setSelectedId(item.id)} />)}</div><div className="inventory-mobile-cards">{items.map((item) => <InventoryCard key={item.id} item={item} />)}</div><div className="inventory-footer"><span>Showing {items.length} products</span><div><button type="button" disabled={!cursors.length} onClick={() => setCursors((value) => value.slice(0, -1))}>Previous</button><button type="button" disabled={!meta?.hasMore || isFetching} onClick={() => meta?.cursor && setCursors((value) => [...value, meta.cursor!])}>Next</button></div></div></>}</div><aside className="inventory-detail-pane">{selected ? <StockItemDetail item={selected} onClose={() => setSelectedId(null)} /> : <div className="inventory-empty-detail"><span>◫</span><p>Select an item to view stock details</p></div>}</aside></div>
+    <div className="inventory-mobile-nav"><Link href="/dashboard">▦<span>Dashboard</span></Link><Link className="active" href="/dashboard/inventory">▣<span>Inventory</span></Link><Link href="/dashboard/orders">▤<span>Orders</span></Link><Link href="/dashboard/credit">⚙<span>Settings</span></Link></div>
+  </div>;
 }
+
+function StatCard({ label, value, icon, tone }: { label: string; value: number; icon: string; tone: string }) { return <div className="inventory-stat"><div><small>{label}</small><strong>{value.toLocaleString()}</strong></div><span className={`inventory-stat-icon ${tone}`}>{icon}</span></div>; }
+
+function InventoryRow({ item, selected, onSelect }: { item: StockItemView; selected: boolean; onSelect: () => void }) { const low = item.lowStockAt !== null && item.available <= item.lowStockAt; const out = item.available <= 0; return <button type="button" className={`inventory-row ${selected ? "selected" : ""}`} onClick={onSelect}><span className="inventory-product"><img src={item.variant.product.media?.[0]?.url} alt="" /><b>{item.variant.product.name}</b></span><span className="inventory-sku">{item.variant.sku}</span><span>{item.variant.product.brand || "General"}</span><strong className={out ? "danger" : ""}>{item.available}</strong><span className={`inventory-status ${out ? "out" : low ? "low" : "good"}`}>{out ? "ⓘ Out of Stock" : low ? "△ Low Stock" : "ⓘ In Stock"}</span><span>{formatMoney(item.sellPrice)}</span><span className="inventory-more">⋮</span></button>; }
+
+function InventoryCard({ item }: { item: StockItemView }) { const low = item.lowStockAt !== null && item.available <= item.lowStockAt; const out = item.available <= 0; return <Link href={`/dashboard/inventory/${item.id}`} className={`inventory-card ${out ? "muted" : ""}`}><img src={item.variant.product.media?.[0]?.url} alt="" /><div><h2>{item.variant.product.name}</h2><p>SKU: {item.variant.sku}</p></div><div className="inventory-card-stock"><strong>{item.available} units</strong><span className={out ? "out" : low ? "low" : "good"}>{out ? "ⓘ OUT" : low ? "△ LOW" : "✓ GOOD"}</span></div><b className="inventory-more">⋮</b></Link>; }
