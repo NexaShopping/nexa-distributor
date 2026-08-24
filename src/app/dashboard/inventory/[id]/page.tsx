@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useInventory } from "@/features/inventory/api";
+import { useInventoryItem } from "@/features/inventory/api";
 import { StockItemDetail } from "@/features/inventory/stock-item-detail";
 import { formatMoney } from "@/lib/money";
 import { ErrorState, Spinner } from "@/components/ui";
 
 export default function InventoryDetailPage() {
   const params = useParams<{ id: string }>();
-  const query = useInventory({});
-  const item = query.data?.data.items.find((entry) => entry.id === params.id);
+  const query = useInventoryItem(params.id);
+  const item = query.data?.item;
   if (query.isLoading) return <div className="grid place-items-center py-20"><Spinner className="h-5 w-5" /></div>;
   if (query.isError) return <ErrorState message="Could not load this inventory item." onRetry={() => query.refetch()} />;
   if (!item) return <ErrorState message="Inventory item not found." onRetry={() => query.refetch()} />;

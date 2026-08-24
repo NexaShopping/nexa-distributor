@@ -1,6 +1,21 @@
 import { tokenStore } from "./auth-store";
 import type { ApiErrorCode, ApiResponse, PageMeta } from "./types";
 
+export type ApiEvent = { tone: "success" | "error"; message: string };
+const apiEventListeners = new Set<(event: ApiEvent) => void>();
+export function subscribeApiEvents(listener: (event: ApiEvent) => void) {
+  apiEventListeners.add(listener);
+  return () => { apiEventListeners.delete(listener); };
+}
+function emitApiEvent(event: ApiEvent) { apiEventListeners.forEach((listener) => listener(event)); }
+function successMessage(path: string) {
+  if (path.includes("/cart")) return "Cart updated.";
+  if (path.includes("/inventory")) return "Inventory updated.";
+  if (path.includes("/accounts")) return "Profile updated.";
+  if (path.includes("/orders")) return "Order updated.";
+  return "Changes saved.";
+}
+
 // The ONLY place fetch is called in this app. Base URL, auth header, and error mapping from
 // the response envelope all live here — never call fetch/axios from a component.
 
@@ -24,14 +39,21 @@ async function requestFull<T>(path: string, init: RequestInit = {}): Promise<{ d
   }
 
   const token = tokenStore.get();
-  const res = await fetch(`${BASE_URL}/api/v1${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init.headers ?? {}),
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}/api/v1${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(init.headers ?? {}),
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to reach the server. Please try again.";
+    emitApiEvent({ tone: "error", message });
+    throw new ApiError("INTERNAL", message, 0);
+  }
 
   let body: ApiResponse<T> | null = null;
   try {
@@ -45,8 +67,11 @@ async function requestFull<T>(path: string, init: RequestInit = {}): Promise<{ d
       body && body.success === false
         ? body.error
         : { code: "INTERNAL" as ApiErrorCode, message: res.statusText || "Request failed" };
+    emitApiEvent({ tone: "error", message: err.message });
     throw new ApiError(err.code, err.message, res.status, err.details);
   }
+
+  if (init.method && init.method !== "GET") emitApiEvent({ tone: "success", message: successMessage(path) });
 
   return { data: body.data, meta: body.meta };
 }

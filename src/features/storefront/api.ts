@@ -27,3 +27,11 @@ export function useStorefront(filters: StorefrontFilters, cursor?: string) {
     placeholderData: (prev) => prev,
   });
 }
+
+export function useStorefrontItem(sellerAccountId: string, id: string) {
+  return useQuery({
+    queryKey: ["storefront-item", sellerAccountId, id],
+    queryFn: () => api.get<{ item: StockItemView }>(`/inventory/${id}?sellerAccountId=${encodeURIComponent(sellerAccountId)}`),
+    enabled: Boolean(sellerAccountId && id),
+  });
+}

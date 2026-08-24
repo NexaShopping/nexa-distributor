@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { CustomerForm } from "@/features/customers/customer-form";
 import { useCustomers, type CustomerFilters } from "@/features/customers/api";
 import { Button, EmptyState, ErrorState, Input, Select, Spinner } from "@/components/ui";
@@ -12,10 +13,17 @@ export default function CustomersPage() {
   const [searchInput, setSearchInput] = useState("");
   const [cursors, setCursors] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const searchParams = useSearchParams();
   const cursor = cursors.at(-1);
   const { data, isLoading, isError, error, refetch, isFetching } = useCustomers(filters, cursor);
   const customers = data?.data.customers ?? [];
   const meta = data?.meta;
+
+  useEffect(() => {
+    const query = searchParams.get("q");
+    if (query) setSearchInput(query);
+    if (query) setFilters((current) => ({ ...current, q: query }));
+  }, [searchParams]);
 
   function updateFilters(next: Partial<CustomerFilters>) {
     setCursors([]);

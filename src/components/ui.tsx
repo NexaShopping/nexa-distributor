@@ -1,6 +1,6 @@
 // Small shared kit so screens don't re-invent the same button/input/badge classes each time.
 // Admin and distributor may diverge later — copy this file rather than sharing it (ADR-0007).
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, InputHTMLAttributes, LabelHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -73,8 +73,8 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
   );
 }
 
-export function Label({ children, className }: { children: ReactNode; className?: string }) {
-  return <label className={cx("mb-1.5 block text-xs font-medium text-ink-soft", className)}>{children}</label>;
+export function Label({ children, className, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
+  return <label className={cx("mb-1.5 block text-xs font-medium text-ink-soft", className)} {...props}>{children}</label>;
 }
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {

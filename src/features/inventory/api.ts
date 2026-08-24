@@ -36,6 +36,14 @@ export function useInventory(filters: InventoryFilters, cursor?: string) {
   });
 }
 
+export function useInventoryItem(id: string) {
+  return useQuery({
+    queryKey: ["my-inventory-item", id],
+    queryFn: () => api.get<{ item: StockItemView }>(`/inventory/${id}`),
+    enabled: Boolean(id),
+  });
+}
+
 export function useUpdateStockItem(id: string) {
   const qc = useQueryClient();
   return useMutation({

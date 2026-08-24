@@ -6,16 +6,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button, Spinner } from "@/components/ui";
-import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, Users, Wallet } from "flowbite-react-icons/outline";
+import { ToastProvider } from "@/components/feedback";
+import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Search, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
+import { Drawer } from "vaul";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/dashboard/buy", label: "Products", icon: Store },
+  { href: "/dashboard/buy", label: "Shopping", icon: Store },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
-  { href: "/dashboard/customers", label: "Customers", icon: Users },
+  { href: "/dashboard/customers", label: "My Customers", icon: Users },
   { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
   { href: "/dashboard/sales", label: "Reports", icon: ChartPie },
-  { href: "/dashboard/credit", label: "Settings", icon: Cog },
+  { href: "/dashboard/credit", label: "Credits", icon: Cog },
+  { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 
 function getPageHeader(pathname: string) {
@@ -33,6 +36,7 @@ function getPageHeader(pathname: string) {
   if (pathname.startsWith("/dashboard/sales")) return { title: "Reports & analytics", description: "Track customer sales fulfilled from your inventory." };
   if (pathname.startsWith("/dashboard/settlements")) return { title: "Settlements", description: "Track customer-sale proceeds released by NexaShopping." };
   if (pathname.startsWith("/dashboard/credit")) return { title: "Trade credit", description: "Track your balance, due charges, and repayments." };
+  if (pathname.startsWith("/dashboard/profile")) return { title: "Profile", description: "Manage your distributor account details." };
   return { title: "Distributor workspace", description: "Manage your NexaShopping account." };
 }
 
@@ -43,7 +47,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState("");
   const pageHeader = getPageHeader(pathname);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const value = globalSearch.trim();
+      if (!value) {
+        if (window.location.search.includes("q=")) router.replace(pathname);
+        return;
+      }
+      const target = pathname.startsWith("/dashboard/inventory") ? "/dashboard/inventory" : pathname.startsWith("/dashboard/customers") ? "/dashboard/customers" : "/dashboard/buy";
+      router.replace(`${target}?q=${encodeURIComponent(value)}`);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [globalSearch, pathname, router]);
 
   useEffect(() => {
     if (status === "anon") router.replace("/login");
@@ -65,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex flex-1">
+    <ToastProvider><div className="flex flex-1">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-hidden border-r border-line bg-surface sm:flex">
         <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
           <Image src="/logo.png" alt="" width={26} height={25} className="h-6.5 w-auto" />
@@ -98,50 +116,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex min-h-16 items-center justify-between gap-4 border-b border-line bg-surface px-4 sm:px-5">
+        <header className="flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:flex-nowrap sm:gap-4 sm:px-5 sm:py-0">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
-            <div className="flex shrink-0 items-center gap-2.5 sm:hidden">
-            <button type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-expanded={mobileMenuOpen} aria-controls="distributor-mobile-nav" className="grid h-9 w-9 place-items-center rounded-lg border border-line text-ink transition-colors hover:bg-canvas">
-              <span className="sr-only">{mobileMenuOpen ? "Close navigation" : "Open navigation"}</span>
-              {mobileMenuOpen ? <Close className="h-5 w-5" /> : <Bars className="h-5 w-5" />}
-            </button>
-            <Image src="/logo.png" alt="" width={24} height={23} className="h-6 w-auto" />
-            </div>
+            <Drawer.Root open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} direction="left">
+              <div className="flex shrink-0 items-center gap-2.5 sm:hidden">
+                <Drawer.Trigger asChild>
+                  <button type="button" aria-expanded={mobileMenuOpen} aria-controls="distributor-mobile-nav" className="grid h-9 w-9 place-items-center rounded-lg border border-line text-ink transition-colors hover:bg-canvas">
+                    <span className="sr-only">{mobileMenuOpen ? "Close navigation" : "Open navigation"}</span>
+                    {mobileMenuOpen ? <Close className="h-5 w-5" /> : <Bars className="h-5 w-5" />}
+                  </button>
+                </Drawer.Trigger>
+                <Image src="/logo.png" alt="" width={24} height={23} className="h-6 w-auto" />
+              </div>
+              <Drawer.Portal>
+                <Drawer.Overlay className="fixed inset-0 z-40 bg-black/25" />
+                <Drawer.Content id="distributor-mobile-nav" className="fixed inset-y-0 left-0 z-50 flex h-screen w-[min(82vw,320px)] flex-col overflow-hidden border-r border-line bg-surface px-4 py-5 shadow-2xl outline-none">
+                  <Drawer.Title className="sr-only">Distributor navigation</Drawer.Title>
+                  <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><Drawer.Close asChild><button type="button" className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-canvas" aria-label="Close navigation"><Close className="h-5 w-5" /></button></Drawer.Close></div>
+                  <nav className="grid gap-1">
+                    {NAV.map((item) => {
+                      const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
+                      const Icon = item.icon;
+                      return <Drawer.Close key={item.href} asChild><Link href={item.href} className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium ${active ? "bg-brand/10 text-brand" : "text-ink-soft hover:bg-canvas hover:text-ink"}`}><Icon className="h-5 w-5" />{item.label}</Link></Drawer.Close>;
+                    })}
+                  </nav>
+                  <div className="mt-8 space-y-2 border-t border-line pt-5">
+                    <Drawer.Close asChild><Link href="/dashboard/customers" className="flex h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white shadow-sm"><CartPlus className="h-4 w-4" />New Order</Link></Drawer.Close>
+                    <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-600 hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
+                  </div>
+                </Drawer.Content>
+              </Drawer.Portal>
+            </Drawer.Root>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight text-ink sm:text-base">{pageHeader.title}</p>
               <p className="hidden max-w-2xl truncate text-xs text-ink-soft sm:block">{pageHeader.description}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden text-sm text-ink-soft sm:inline">
-              {account?.name ?? account?.phone}
-            </span>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <label className="hidden h-9 w-52 items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-ink-soft focus-within:border-brand sm:flex">
+              <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
+            </label>
+            <Link href="/dashboard/profile" className="hidden text-sm text-ink-soft hover:text-ink sm:inline">{account?.name ?? account?.phone}</Link>
             <Button variant="secondary" size="sm" type="button" onClick={() => setLogoutConfirmOpen(true)} disabled={signingOut}>
               {signingOut ? "Signing out…" : "Log out"}
             </Button>
           </div>
+          <label className="flex h-9 basis-full items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-ink-soft focus-within:border-brand sm:hidden">
+            <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
+          </label>
         </header>
-        <>
-          <button type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} className={`fixed inset-0 z-40 bg-black/25 transition-opacity sm:hidden ${mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"}`} />
-          <div id="distributor-mobile-nav" className={`fixed inset-y-0 left-0 z-50 h-screen w-[min(82vw,320px)] overflow-hidden border-r border-line bg-surface px-4 py-5 shadow-2xl transition-transform duration-300 ease-out sm:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-            <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><button type="button" onClick={() => setMobileMenuOpen(false)} className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-canvas" aria-label="Close navigation"><Close className="h-5 w-5" /></button></div>
-            <nav className="grid gap-1">
-              {NAV.map((item) => {
-                const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
-                const Icon = item.icon;
-                return <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium ${active ? "bg-brand/10 text-brand" : "text-ink-soft hover:bg-canvas hover:text-ink"}`}><Icon className="h-5 w-5" />{item.label}</Link>;
-              })}
-            </nav>
-            <div className="mt-8 space-y-2 border-t border-line pt-5">
-              <Link href="/dashboard/customers" onClick={() => setMobileMenuOpen(false)} className="flex h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white shadow-sm"><CartPlus className="h-4 w-4" />New Order</Link>
-              <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-600 hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
-            </div>
-          </div>
-        </>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
       {logoutConfirmOpen && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/35 p-4" role="presentation"><div role="dialog" aria-modal="true" aria-labelledby="logout-title" className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-2xl"><h2 id="logout-title" className="text-base font-semibold">Log out of NexaShopping?</h2><p className="mt-2 text-sm text-ink-soft">You’ll need to sign in again to manage your distributor account.</p><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setLogoutConfirmOpen(false)} className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-canvas">Cancel</button><button type="button" onClick={handleLogout} disabled={signingOut} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">{signingOut ? "Signing out…" : "Log out"}</button></div></div></div>}
-    </div>
+    </div></ToastProvider>
   );
 }
 

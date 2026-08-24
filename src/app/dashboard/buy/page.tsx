@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { usePrimaryAdmin } from "@/features/admin/api";
 import { useStorefront } from "@/features/storefront/api";
@@ -15,6 +16,7 @@ const CATEGORIES = ["All Items", "Smart Home", "Audio", "Accessories", "Wearable
 
 export default function BuyPage() {
   const admin = usePrimaryAdmin();
+  const searchParams = useSearchParams();
   const sellerAccountId = admin.data?.account.id ?? "";
   const [searchInput, setSearchInput] = useState("");
   const [queryText, setQueryText] = useState<string | undefined>();
@@ -24,6 +26,11 @@ export default function BuyPage() {
   const [cartCount, setCartCount] = useState(0);
   const cursor = cursors.at(-1);
 
+  useEffect(() => {
+    const query = searchParams.get("q") ?? "";
+    setSearchInput(query);
+    setQueryText(query.trim() || undefined);
+  }, [searchParams]);
   useEffect(() => {
     const timer = window.setTimeout(() => { setCursors([]); setQueryText(searchInput.trim() || undefined); }, 300);
     return () => window.clearTimeout(timer);
@@ -64,5 +71,6 @@ function ProductCard({ item, sellerAccountId, onToast, onAdded }: { item: StockI
     try { await addToCart.mutateAsync({ variantId: item.variant.id, quantity }); onAdded(); onToast({ tone: "success", message: `${item.variant.product.name} added to cart.` }); }
     catch (error) { onToast({ tone: "error", message: error instanceof ApiError ? error.message : "Could not add item to cart." }); }
   }
-  return <article className={`buy-product-card ${outOfStock ? "out" : ""}`}><div className="buy-product-image">{media.length ? <img src={media[0].url} alt={media[0].alt ?? item.variant.product.name} /> : <div className="buy-image-placeholder">□</div>}{outOfStock ? <span className="stock-badge out">OUT OF STOCK</span> : <span className={`stock-badge ${lowStock ? "low" : "available"}`}>{lowStock ? `Low Stock (${item.available})` : `In Stock (${item.available})`}</span>}</div><div className="buy-product-info"><div><div className="buy-product-title"><h2>{item.variant.product.name}</h2><span>SKU: {item.variant.sku}</span></div><p>{item.variant.name}</p></div><div className="buy-product-bottom"><div className="buy-price"><small>Purchase Price</small><strong>{formatMoney(price)} <em>/ unit</em></strong></div>{outOfStock ? <button type="button" disabled>Notify Me</button> : <div className="buy-actions"><div className="buy-quantity"><button type="button" disabled={quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button><span>{quantity}</span><button type="button" disabled={quantity >= item.available} onClick={() => setQuantity((value) => Math.min(item.available, value + 1))}>+</button></div><button type="button" className="buy-add" disabled={addToCart.isPending} onClick={handleAdd}><span>🛒</span><b className="buy-add-label">Add</b><b className="buy-buy-label">Buy Now</b></button></div>}</div></div></article>;
+  const detailsHref = `/dashboard/buy/${item.id}`;
+  return <article className={`buy-product-card ${outOfStock ? "out" : ""}`}><Link href={detailsHref} className="buy-product-image" aria-label={`View details for ${item.variant.product.name}`}>{media.length ? <img src={media[0].url} alt={media[0].alt ?? item.variant.product.name} /> : <div className="buy-image-placeholder">□</div>}{outOfStock ? <span className="stock-badge out">OUT OF STOCK</span> : <span className={`stock-badge ${lowStock ? "low" : "available"}`}>{lowStock ? `Low Stock (${item.available})` : `In Stock (${item.available})`}</span>}</Link><div className="buy-product-info"><div><Link href={detailsHref} className="buy-product-title"><h2>{item.variant.product.name}</h2><span>SKU: {item.variant.sku}</span></Link><p>{item.variant.name}</p></div><div className="buy-product-bottom"><div className="buy-price"><small>Purchase Price</small><strong>{formatMoney(price)} <em>/ unit</em></strong></div>{outOfStock ? <button type="button" disabled>Notify Me</button> : <div className="buy-actions"><div className="buy-quantity"><button type="button" disabled={quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button><span>{quantity}</span><button type="button" disabled={quantity >= item.available} onClick={() => setQuantity((value) => Math.min(item.available, value + 1))}>+</button></div><button type="button" className="buy-add" disabled={addToCart.isPending} onClick={handleAdd}><span>🛒</span><b className="buy-add-label">Add</b><b className="buy-buy-label">Buy Now</b></button></div>}</div></div></article>;
 }

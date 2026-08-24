@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useInventory, type InventoryFilters } from "@/features/inventory/api";
 import { StockItemDetail } from "@/features/inventory/stock-item-detail";
 import { formatMoney } from "@/lib/money";
@@ -13,6 +14,7 @@ export default function InventoryPage() {
   const [qInput, setQInput] = useState("");
   const [cursors, setCursors] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
   const cursor = cursors.at(-1);
   const { data, isLoading, isError, error, refetch, isFetching } = useInventory(filters, cursor);
   const items = data?.data.items ?? [];
@@ -21,6 +23,12 @@ export default function InventoryPage() {
   const inStock = items.filter((item) => item.available > 0).length;
   const lowStock = items.filter((item) => item.lowStockAt !== null && item.available <= item.lowStockAt).length;
   const outOfStock = items.filter((item) => item.available <= 0).length;
+
+  useEffect(() => {
+    const query = searchParams.get("q");
+    if (query) setQInput(query);
+    if (query) setFilters((current) => ({ ...current, q: query }));
+  }, [searchParams]);
 
   function updateFilters(next: Partial<InventoryFilters>) { setCursors([]); setFilters((value) => ({ ...value, ...next })); }
   function search(event: React.FormEvent) { event.preventDefault(); updateFilters({ q: qInput.trim() || undefined }); }
