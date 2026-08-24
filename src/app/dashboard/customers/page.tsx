@@ -23,8 +23,8 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="customers-page mx-auto max-w-5xl">
+      <div className="customers-heading flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Customers</h1>
           <p className="mt-1 text-sm text-ink-soft">Your private customer list and assisted-sale relationships.</p>
@@ -34,7 +34,7 @@ export default function CustomersPage() {
 
       {showForm && <div className="mt-5"><CustomerForm onCancel={() => setShowForm(false)} /></div>}
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+      <div className="customers-filters mt-5 flex flex-col gap-3 sm:flex-row">
         <form
           className="flex-1 sm:max-w-sm"
           onSubmit={(event) => {
@@ -67,7 +67,7 @@ export default function CustomersPage() {
         ) : customers.length === 0 ? (
           <EmptyState title="No customers found" hint="Add a customer by phone, or change the current filters." />
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-line">
+          <div className="customers-table overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-canvas text-left text-xs text-ink-soft">
                 <tr>

@@ -31,7 +31,7 @@ export function CustomerDetail({ relationship }: { relationship: CustomerRelatio
   const name = relationship.displayName || relationship.customer.name || relationship.customer.phone || "Customer";
 
   return (
-    <div className="space-y-5">
+    <div className="customer-detail-card space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{name}</h1>
