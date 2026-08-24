@@ -6,15 +6,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/ui";
+import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, Users, Wallet } from "flowbite-react-icons/outline";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
-  { href: "/dashboard/buy", label: "Products", icon: StoreIcon },
-  { href: "/dashboard/orders", label: "Orders", icon: OrdersIcon },
-  { href: "/dashboard/customers", label: "Customers", icon: CustomersIcon },
-  { href: "/dashboard/settlements", label: "Payouts", icon: MoneyIcon },
-  { href: "/dashboard/sales", label: "Reports", icon: SalesIcon },
-  { href: "/dashboard/credit", label: "Settings", icon: CreditIcon },
+  { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/dashboard/buy", label: "Products", icon: Store },
+  { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
+  { href: "/dashboard/customers", label: "Customers", icon: Users },
+  { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
+  { href: "/dashboard/sales", label: "Reports", icon: ChartPie },
+  { href: "/dashboard/credit", label: "Settings", icon: Cog },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -72,8 +73,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
         <div className="mt-auto space-y-2 border-t border-line p-3">
-          <Link href="/dashboard/customers" className="flex items-center justify-center rounded-lg bg-brand px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-brand-strong">+ <span className="ml-1">New Order</span></Link>
-          <button type="button" onClick={() => setLogoutConfirmOpen(true)} className="flex w-full items-center justify-center rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50">Log out</button>
+          <Link href="/dashboard/customers" className="flex h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-strong"><CartPlus className="h-4 w-4" />New Order</Link>
+          <button type="button" onClick={() => setLogoutConfirmOpen(true)} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-600 transition hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
         </div>
       </aside>
 
@@ -82,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-2.5 sm:hidden">
             <button type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-expanded={mobileMenuOpen} aria-controls="distributor-mobile-nav" className="grid h-9 w-9 place-items-center rounded-lg border border-line text-ink transition-colors hover:bg-canvas">
               <span className="sr-only">{mobileMenuOpen ? "Close navigation" : "Open navigation"}</span>
-              <span className="text-xl leading-none">{mobileMenuOpen ? "×" : "☰"}</span>
+              {mobileMenuOpen ? <Close className="h-5 w-5" /> : <Bars className="h-5 w-5" />}
             </button>
             <Image src="/logo.png" alt="" width={24} height={23} className="h-6 w-auto" />
             <span className="font-semibold tracking-tight">
@@ -107,7 +108,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <>
           <button type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} className={`fixed inset-0 z-40 bg-black/25 transition-opacity sm:hidden ${mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"}`} />
           <div id="distributor-mobile-nav" className={`fixed inset-y-0 left-0 z-50 h-screen w-[min(82vw,320px)] overflow-hidden border-r border-line bg-surface px-4 py-5 shadow-2xl transition-transform duration-300 ease-out sm:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-            <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-2 py-1 text-xl text-ink-soft hover:bg-canvas" aria-label="Close navigation">×</button></div>
+            <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><button type="button" onClick={() => setMobileMenuOpen(false)} className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-canvas" aria-label="Close navigation"><Close className="h-5 w-5" /></button></div>
             <nav className="grid gap-1">
               {NAV.map((item) => {
                 const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
@@ -116,8 +117,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               })}
             </nav>
             <div className="mt-8 space-y-2 border-t border-line pt-5">
-              <Link href="/dashboard/customers" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-center rounded-lg bg-brand px-4 py-3 font-semibold text-white shadow-sm">+ <span className="ml-1">New Order</span></Link>
-              <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex w-full items-center justify-center rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50">Log out</button>
+              <Link href="/dashboard/customers" onClick={() => setMobileMenuOpen(false)} className="flex h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white shadow-sm"><CartPlus className="h-4 w-4" />New Order</Link>
+              <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-600 hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
             </div>
           </div>
         </>

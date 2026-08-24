@@ -1,10 +1,37 @@
 // Small shared kit so screens don't re-invent the same button/input/badge classes each time.
 // Admin and distributor may diverge later — copy this file rather than sharing it (ADR-0007).
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export function cx(...parts: (string | false | null | undefined)[]): string {
-  return parts.filter(Boolean).join(" ");
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
+
+export const cx = (...parts: (string | false | null | undefined)[]) => cn(parts);
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        primary: "bg-brand text-white shadow-sm hover:bg-brand-strong",
+        secondary: "border border-line bg-surface text-ink hover:bg-canvas",
+        ghost: "text-ink-soft hover:bg-canvas hover:text-ink",
+        danger: "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100",
+        link: "text-brand underline-offset-4 hover:underline",
+      },
+      size: {
+        sm: "h-8 px-3 text-xs",
+        md: "h-10 px-4",
+        lg: "h-11 px-5",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: { variant: "primary", size: "md" },
+  },
+);
 
 export function Button({
   variant = "primary",
@@ -12,27 +39,20 @@ export function Button({
   className,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md";
+  variant?: VariantProps<typeof buttonVariants>["variant"];
+  size?: VariantProps<typeof buttonVariants>["size"];
 }) {
-  const base =
-    "inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none";
-  const sizes = { sm: "h-8 px-3 text-sm", md: "h-10 px-4 text-sm" };
-  const variants = {
-    primary: "bg-brand text-white hover:bg-brand-strong",
-    secondary: "border border-line bg-surface text-ink hover:bg-canvas",
-    ghost: "text-ink-soft hover:bg-canvas hover:text-ink",
-    danger: "bg-red-50 text-red-700 hover:bg-red-100",
-  };
-  return <button className={cx(base, sizes[size], variants[variant], className)} {...props} />;
+  return <button className={cn(buttonVariants({ variant, size }), className)} {...props} />;
 }
+
+export { buttonVariants };
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={cx(
-        "h-10 w-full rounded-md border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-soft/60",
-        "focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand",
+        "h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-soft/60 shadow-sm transition-colors",
+        "focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25",
         className,
       )}
       {...props}
@@ -44,8 +64,8 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
   return (
     <select
       className={cx(
-        "h-10 w-full rounded-md border border-line bg-surface px-3 text-sm text-ink",
-        "focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand",
+        "h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink shadow-sm transition-colors",
+        "focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25",
         className,
       )}
       {...props}
@@ -58,7 +78,22 @@ export function Label({ children, className }: { children: ReactNode; className?
 }
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx("rounded-xl border border-line bg-surface", className)}>{children}</div>;
+  return <div className={cn("rounded-xl border border-line bg-surface shadow-[0_1px_2px_rgba(26,26,23,.04)]", className)}>{children}</div>;
+}
+
+export function Badge({ children, className, tone = "neutral" }: { children: ReactNode; className?: string; tone?: "neutral" | "brand" | "success" | "danger" | "warning" }) {
+  const tones = {
+    neutral: "border-line bg-canvas text-ink-soft",
+    brand: "border-brand/20 bg-brand/10 text-brand-strong",
+    success: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    danger: "border-red-200 bg-red-50 text-red-700",
+    warning: "border-amber-200 bg-amber-50 text-amber-700",
+  };
+  return <span className={cn("inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold", tones[tone], className)}>{children}</span>;
+}
+
+export function Separator({ className }: { className?: string }) {
+  return <div role="separator" className={cn("h-px w-full bg-line", className)} />;
 }
 
 export function EmptyState({ title, hint, action }: { title: string; hint?: string; action?: ReactNode }) {
