@@ -22,8 +22,8 @@ export default function CreditPage() {
 
   const credit = summary.data.credit;
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <div><h1 className="text-xl font-semibold">Trade credit</h1><p className="mt-1 text-sm text-ink-soft">Track your balance, due charges, and repayments.</p></div>
+    <div className="settings-page mx-auto max-w-5xl space-y-6">
+      <div className="settings-heading"><p className="settings-eyebrow">Account settings</p><h1 className="text-xl font-semibold">Trade credit</h1><p className="mt-1 text-sm text-ink-soft">Track your balance, due charges, and repayments.</p></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Metric label="Available credit" value={formatMoney(credit.availableCredit)} />
         <Metric label="Outstanding balance" value={formatMoney(credit.currentBalance)} />
@@ -39,7 +39,7 @@ export default function CreditPage() {
 }
 
 function Metric({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
-  return <Card className="p-4"><p className="text-xs font-medium uppercase tracking-wide text-ink-soft">{label}</p><p className={`mt-2 text-lg font-semibold ${danger ? "text-red-600" : ""}`}>{value}</p></Card>;
+  return <Card className="settings-metric p-4"><p className="text-xs font-medium uppercase tracking-wide text-ink-soft">{label}</p><p className={`mt-2 text-lg font-semibold ${danger ? "text-red-600" : ""}`}>{value}</p></Card>;
 }
 
 function RepaymentCard({ accountId, currentBalance, disabled }: { accountId: string; currentBalance: string; disabled: boolean }) {
