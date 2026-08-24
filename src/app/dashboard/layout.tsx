@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex flex-1">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface sm:flex">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-hidden border-r border-line bg-surface sm:flex">
         <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
           <Image src="/logo.png" alt="" width={26} height={25} className="h-6.5 w-auto" />
           <span className="font-semibold tracking-tight">
@@ -106,7 +106,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
         <>
           <button type="button" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} className={`fixed inset-0 z-40 bg-black/25 transition-opacity sm:hidden ${mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"}`} />
-          <div id="distributor-mobile-nav" className={`fixed inset-y-0 left-0 z-50 w-[min(82vw,320px)] overflow-y-auto border-r border-line bg-surface px-4 py-5 shadow-2xl transition-transform duration-300 ease-out sm:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+          <div id="distributor-mobile-nav" className={`fixed inset-y-0 left-0 z-50 h-screen w-[min(82vw,320px)] overflow-hidden border-r border-line bg-surface px-4 py-5 shadow-2xl transition-transform duration-300 ease-out sm:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
             <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-2 py-1 text-xl text-ink-soft hover:bg-canvas" aria-label="Close navigation">×</button></div>
             <nav className="grid gap-1">
               {NAV.map((item) => {
