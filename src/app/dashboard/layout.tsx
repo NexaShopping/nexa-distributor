@@ -23,6 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (status === "anon") router.replace("/login");
@@ -37,6 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   async function handleLogout() {
+    setLogoutConfirmOpen(false);
     setSigningOut(true);
     await logout();
     router.replace("/login");
@@ -51,9 +53,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Nexa<span className="text-brand">Shopping</span>
           </span>
         </div>
-        <button type="button" className="mx-4 mt-8 mb-5 rounded-lg bg-brand px-4 py-3 font-semibold text-white shadow-sm hover:bg-brand-strong">
-          + <span className="ml-1">New Order</span>
-        </button>
         <nav className="flex-1 space-y-0.5 p-3">
           {NAV.map((item) => {
             const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
@@ -72,6 +71,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
+        <div className="mt-auto space-y-2 border-t border-line p-3">
+          <Link href="/dashboard/customers" className="flex items-center justify-center rounded-lg bg-brand px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-brand-strong">+ <span className="ml-1">New Order</span></Link>
+          <button type="button" onClick={() => setLogoutConfirmOpen(true)} className="flex w-full items-center justify-center rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50">Log out</button>
+        </div>
       </aside>
 
       <div className="flex flex-1 flex-col">
@@ -93,7 +96,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </span>
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setLogoutConfirmOpen(true)}
               disabled={signingOut}
               className="rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:bg-canvas disabled:opacity-60"
             >
@@ -112,10 +115,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 return <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium ${active ? "bg-brand/10 text-brand" : "text-ink-soft hover:bg-canvas hover:text-ink"}`}><Icon className="h-5 w-5" />{item.label}</Link>;
               })}
             </nav>
+            <div className="mt-8 space-y-2 border-t border-line pt-5">
+              <Link href="/dashboard/customers" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-center rounded-lg bg-brand px-4 py-3 font-semibold text-white shadow-sm">+ <span className="ml-1">New Order</span></Link>
+              <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex w-full items-center justify-center rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50">Log out</button>
+            </div>
           </div>
         </>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+      {logoutConfirmOpen && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/35 p-4" role="presentation"><div role="dialog" aria-modal="true" aria-labelledby="logout-title" className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-2xl"><h2 id="logout-title" className="text-base font-semibold">Log out of NexaShopping?</h2><p className="mt-2 text-sm text-ink-soft">You’ll need to sign in again to manage your distributor account.</p><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setLogoutConfirmOpen(false)} className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-canvas">Cancel</button><button type="button" onClick={handleLogout} disabled={signingOut} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">{signingOut ? "Signing out…" : "Log out"}</button></div></div></div>}
     </div>
   );
 }
