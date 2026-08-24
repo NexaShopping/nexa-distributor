@@ -32,6 +32,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::selection { background: rgba(242,117,31,.22); color: var(--ink); }
+*:focus-visible { outline: 3px solid rgba(242,117,31,.42); outline-offset: 2px; }
+* { scrollbar-color: rgba(140,113,100,.45) transparent; scrollbar-width: thin; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
 .login-shell {
   height: 100vh;
   min-height: 100svh;
