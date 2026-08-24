@@ -8,20 +8,25 @@ import type { AdjustStockBody, StockItemView } from "@/lib/types";
 import { formatMoney } from "@/lib/money";
 
 export function StockItemDetail({ item, onClose }: { item: StockItemView; onClose: () => void }) {
+  const image = item.variant.product.media?.[0]?.url;
+  const stockState = item.available <= 0 ? "out" : item.available <= (item.lowStockAt ?? 0) ? "low" : "good";
+  const statusLabel = stockState === "out" ? "Out of stock" : stockState === "low" ? "Low stock" : "In stock";
   return (
-    <div className="space-y-4">
+    <div className="inventory-drawer space-y-4">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">{item.variant.product.brand}</p>
+          <div className="inventory-drawer-kicker"><span className={`inventory-drawer-status ${stockState}`}>{statusLabel}</span><span>SKU {item.variant.sku}</span></div>
           <p className="font-medium">
             {item.variant.product.name} — {item.variant.name}
           </p>
-          <p className="font-mono text-xs text-ink-soft">{item.variant.sku}</p>
+          <p className="text-sm text-ink-soft">{item.variant.product.brand}</p>
         </div>
-        <button onClick={onClose} className="text-sm text-ink-soft hover:text-ink">
-          Close
-        </button>
+        <button onClick={onClose} className="inventory-drawer-close text-sm text-ink-soft hover:text-ink" aria-label="Close inventory detail">×</button>
       </div>
+
+      <section className="inventory-drawer-hero">{image ? <img src={image} alt={item.variant.product.name} /> : <div className="inventory-drawer-image-fallback">{item.variant.product.name.slice(0, 1)}</div>}</section>
+      <section className="inventory-drawer-section"><h3>Inventory overview</h3><div className="inventory-drawer-overview"><Stat label="Current stock" value={item.available} accent={stockState !== "good"} /><Stat label="Category" value={item.variant.product.brand} text /><Stat label="Unit price" value={formatMoney(item.sellPrice)} text /></div></section>
+      <section className="inventory-drawer-section inventory-drawer-history"><h3>Stock history</h3><div className="inventory-drawer-history-card"><span className="inventory-drawer-history-dot" /><div><strong>{stockState === "low" ? "Stock alert triggered" : "Inventory status updated"}</strong><small>Today · Available quantity {item.available}</small></div></div></section>
 
       <div className="grid grid-cols-3 gap-2 text-center">
         <Stat label="On hand" value={item.onHand} />
@@ -36,12 +41,9 @@ export function StockItemDetail({ item, onClose }: { item: StockItemView; onClos
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+function Stat({ label, value, accent, text }: { label: string; value: number | string; accent?: boolean; text?: boolean }) {
   return (
-    <Card className="p-3">
-      <p className={`text-lg font-semibold tabular-nums ${accent ? "text-brand" : ""}`}>{value}</p>
-      <p className="text-xs text-ink-soft">{label}</p>
-    </Card>
+    <div className="inventory-drawer-stat"><span>{label}</span><strong className={accent ? "accent" : ""}>{value}</strong>{!text && <small>Units</small>}</div>
   );
 }
 
