@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowRight, Bell, ChartPie, ClipboardList, ShoppingBag, Truck, UserAdd, Users, Wallet } from "flowbite-react-icons/outline";
+import { ArrowRight, Bell, ChartPie, ClipboardList, ShoppingBag, UserAdd } from "flowbite-react-icons/outline";
 import { useAuth } from "@/lib/auth-context";
 import { usePrimaryAdmin } from "@/features/admin/api";
 import { useCart } from "@/features/cart/api";
@@ -14,9 +14,9 @@ import { formatMoney } from "@/lib/money";
 import { Badge, Card, ErrorState, Spinner } from "@/components/ui";
 import type { Order, StockItemView } from "@/lib/types";
 
-interface DashboardPageProps {}
-
 const FALLBACK_SALES = [42, 58, 51, 74, 68, 92, 86, 108];
+
+interface DashboardPageProps {}
 
 export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
   const { account } = useAuth();
@@ -58,16 +58,19 @@ export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
       </section>
 
       <section className="dashboard-v2-kpis" aria-label="Distributor KPIs">
-        <KpiCard icon={<ChartPie className="h-5 w-5" />} label="Inventory health" value={`${healthyPercent || 92}% healthy`} detail={`${lowStockItems.length || 8} items low-stock`} tone="danger" href="/dashboard/inventory" />
-        <KpiCard icon={<Truck className="h-5 w-5" />} label="Open orders" value={orders.isLoading ? "—" : String(openOrders.length)} detail={`${formatMoney(pendingValue.toFixed(2))} pending`} tone="brand" href="/dashboard/orders" />
-        <KpiCard icon={<Users className="h-5 w-5" />} label="Customers" value={customers.isLoading ? "—" : customerRows.length.toLocaleString()} detail="+12.4% vs last month" tone="success" href="/dashboard/customers" />
-        <KpiCard icon={<Wallet className="h-5 w-5" />} label="Payable balance" value={payables.isLoading ? "—" : formatMoney(payableTotal.toFixed(2))} detail="Due in 12 days" tone="warning" href="/dashboard/credit" />
+        <KpiCard label="Inventory health" value={`${healthyPercent || 92}%`} detail={`${lowStockItems.length || 8} items low-stock`} tone="danger" href="/dashboard/inventory" />
+        <KpiCard label="Open orders" value={orders.isLoading ? "—" : String(openOrders.length)} detail={`${formatMoney(pendingValue.toFixed(2))} pending`} tone="brand" href="/dashboard/orders" />
+        <KpiCard label="Customers" value={customers.isLoading ? "—" : customerRows.length.toLocaleString()} detail="+12.4% vs last month" tone="success" href="/dashboard/customers" />
+        <KpiCard label="Payable balance" value={payables.isLoading ? "—" : formatMoney(payableTotal.toFixed(2))} detail="Due in 12 days" tone="warning" href="/dashboard/credit" />
       </section>
 
       <section className="dashboard-v2-main-grid">
         <SalesChart values={sales} loading={orders.isFetching} />
-        <HealthCard healthy={healthyPercent || 92} low={lowStockItems.length || 8} />
-        <QuickActions cartCount={itemCount} />
+        <EmptyDashboardPanel />
+        <div className="dashboard-v2-right-card">
+          <HealthCard healthy={healthyPercent || 92} low={lowStockItems.length || 8} />
+          <QuickActions cartCount={itemCount} />
+        </div>
       </section>
 
       <section className="dashboard-v2-lower-grid">
@@ -79,9 +82,10 @@ export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
   );
 }
 
-interface KpiCardProps { icon: React.ReactNode; label: string; value: string; detail: string; tone: "brand" | "success" | "danger" | "warning"; href: string }
-function KpiCard({ icon, label, value, detail, tone, href }: Readonly<KpiCardProps>) {
-  return <Link href={href} className="dashboard-v2-kpi"><div className="dashboard-v2-kpi-top"><span>{label}</span><span className={`dashboard-v2-icon ${tone}`}>{icon}</span></div><strong>{value}</strong><small className={tone}>{detail}</small></Link>;
+interface KpiCardProps { label: string; value: string; detail: string; tone: "brand" | "success" | "danger" | "warning"; href: string }
+function KpiCard({ label, value, detail, tone, href }: Readonly<KpiCardProps>) {
+  const art = label === "Inventory health" ? "inventory" : label === "Open orders" ? "orders" : label === "Customers" ? "customers" : "payable";
+  return <Link href={href} className={`dashboard-v2-kpi dashboard-v2-kpi-${art}`}><img className="dashboard-v2-kpi-art dashboard-v2-kpi-art-desktop" src={`/dashboard/kpi-${art}-desktop.png`} alt="" aria-hidden="true" /><img className="dashboard-v2-kpi-art dashboard-v2-kpi-art-mobile" src={`/dashboard/kpi-${art}-mobile.png`} alt="" aria-hidden="true" /><div className="dashboard-v2-kpi-top"><span>{label}</span></div><strong>{value}</strong><small className={tone}>{detail}</small></Link>;
 }
 
 interface SalesChartProps { values: number[]; loading: boolean }
@@ -91,10 +95,14 @@ function SalesChart({ values, loading }: Readonly<SalesChartProps>) {
   return <Card className="dashboard-v2-chart"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Performance</p><h2>Sales performance</h2></div><div className="dashboard-v2-segment"><button type="button" className="active">Weekly</button><button type="button">Monthly</button></div></div><div className="dashboard-v2-bars" aria-label="Sales performance chart">{bars.map((height, index) => <div className="dashboard-v2-bar-wrap" key={`${values[index]}-${index}`}><span className={index === bars.length - 1 ? "active" : ""} style={{ height: `${height}%` }} title={`₹${values[index]}k`} /><small>{index + 1}w</small></div>)}</div>{loading && <div className="dashboard-v2-chart-sync"><Spinner className="h-3.5 w-3.5" /> Syncing latest orders</div>}</Card>;
 }
 
+function EmptyDashboardPanel() {
+  return <Card className="dashboard-v2-health dashboard-v2-empty-panel" aria-label="Empty dashboard workspace" />;
+}
+
 interface HealthCardProps { healthy: number; low: number }
 function HealthCard({ healthy, low }: Readonly<HealthCardProps>) {
   const critical = Math.min(8, low); const watch = Math.max(0, 100 - healthy - critical);
-  return <Card className="dashboard-v2-health"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Inventory</p><h2>Health</h2></div><Link href="/dashboard/inventory" aria-label="Open inventory"><ArrowRight className="h-5 w-5 text-ink-soft" /></Link></div><div className="dashboard-v2-donut" style={{ background: `conic-gradient(#5B4BDB 0 ${healthy}%, #8B7CF6 ${healthy}% ${healthy + watch}%, #EF4444 ${healthy + watch}% 100%)` }}><div><strong>{healthy}%</strong><span>healthy</span></div></div><div className="dashboard-v2-legend"><span><i className="healthy" />Healthy {healthy}%</span><span><i className="watch" />Watch {watch}%</span><span><i className="critical" />Critical {critical}%</span></div></Card>;
+  return <Card className="dashboard-v2-health"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Inventory</p><h2>Health</h2></div><Link href="/dashboard/inventory" aria-label="Open inventory"><ArrowRight className="h-5 w-5 text-ink-soft" /></Link></div><div className="dashboard-v2-donut" style={{ background: `conic-gradient(#f2751f 0 ${healthy}%, #f5b37f ${healthy}% ${healthy + watch}%, #ef4444 ${healthy + watch}% 100%)` }}><div><strong>{healthy}%</strong><span>healthy</span></div></div><div className="dashboard-v2-legend"><span><i className="healthy" />Healthy {healthy}%</span><span><i className="watch" />Watch {watch}%</span><span><i className="critical" />Critical {critical}%</span></div></Card>;
 }
 
 interface QuickActionsProps { cartCount: number }

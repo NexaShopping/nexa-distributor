@@ -14,7 +14,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/buy", label: "Shopping", icon: Store },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
-  { href: "/dashboard/customers", label: "My Customers", icon: Users },
+  { href: "/dashboard/customers", label: "Customers", icon: Users },
   { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
   { href: "/dashboard/sales", label: "Reports", icon: ChartPie },
   { href: "/dashboard/credit", label: "Credits", icon: Cog },
@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <ToastProvider><div className="flex w-full min-w-0 flex-1">
+    <ToastProvider><div className="flex h-screen w-full min-w-0 flex-1 overflow-hidden">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-hidden border-r border-line bg-surface sm:flex">
         <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
           <Image src="/logo.png" alt="" width={26} height={25} className="h-6.5 w-auto" />
@@ -112,12 +112,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
         <div className="mt-auto space-y-2 border-t border-line p-3">
-          <Link href="/dashboard/customers" className="flex h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-strong"><CartPlus className="h-4 w-4" />New Order</Link>
-          <button type="button" onClick={() => setLogoutConfirmOpen(true)} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-600 transition hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
+          <Link href="/dashboard/customers" className="flex h-10 items-center justify-center gap-2 rounded-lg bg-brand px-3.5 text-[13px] font-medium text-white shadow-sm transition hover:bg-brand-strong"><CartPlus className="h-4 w-4" />New Order</Link>
+          <button type="button" onClick={() => setLogoutConfirmOpen(true)} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-medium text-red-600 transition hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
         </div>
       </aside>
 
-      <div className="flex w-full min-w-0 flex-1 flex-col">
+      <div className="flex h-screen min-h-0 w-full min-w-0 flex-1 flex-col">
         <header className="flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:flex-nowrap sm:gap-4 sm:px-5 sm:py-0">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <Drawer.Root open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} direction="left">
@@ -143,8 +143,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     })}
                   </nav>
                   <div className="mt-8 space-y-2 border-t border-line pt-5">
-                    <Drawer.Close asChild><Link href="/dashboard/customers" className="flex h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white shadow-sm"><CartPlus className="h-4 w-4" />New Order</Link></Drawer.Close>
-                    <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-600 hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
+                    <Drawer.Close asChild><Link href="/dashboard/customers" className="flex h-10 items-center justify-center gap-2 rounded-lg bg-brand px-3.5 text-[13px] font-medium text-white shadow-sm"><CartPlus className="h-4 w-4" />New Order</Link></Drawer.Close>
+                    <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-medium text-red-600 hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
                   </div>
                 </Drawer.Content>
               </Drawer.Portal>
@@ -168,9 +168,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
           </label>
         </header>
-        <main className="w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-6">{children}</main>
+        <main className="w-full min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-6">{children}</main>
       </div>
-      {logoutConfirmOpen && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/35 p-4" role="presentation"><div role="dialog" aria-modal="true" aria-labelledby="logout-title" className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-2xl"><h2 id="logout-title" className="text-base font-semibold">Log out of NexaShopping?</h2><p className="mt-2 text-sm text-ink-soft">You’ll need to sign in again to manage your distributor account.</p><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setLogoutConfirmOpen(false)} className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-canvas">Cancel</button><button type="button" onClick={handleLogout} disabled={signingOut} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">{signingOut ? "Signing out…" : "Log out"}</button></div></div></div>}
+      {logoutConfirmOpen && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/35 p-4" role="presentation"><div role="dialog" aria-modal="true" aria-labelledby="logout-title" className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-2xl"><h2 id="logout-title" className="text-base font-semibold">Log out of NexaShopping?</h2><p className="mt-2 text-sm text-ink-soft">You’ll need to sign in again to manage your distributor account.</p><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setLogoutConfirmOpen(false)} className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-canvas">Cancel</button><button type="button" onClick={handleLogout} disabled={signingOut} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60">{signingOut ? "Signing out…" : "Log out"}</button></div></div></div>}
     </div></ToastProvider>
   );
 }
