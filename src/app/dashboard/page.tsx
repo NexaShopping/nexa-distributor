@@ -96,7 +96,7 @@ function SalesChart({ values, loading }: Readonly<SalesChartProps>) {
 }
 
 function EmptyDashboardPanel() {
-  return <Card className="dashboard-v2-health dashboard-v2-empty-panel" aria-label="Empty dashboard workspace" />;
+  return <Card className="dashboard-v2-health dashboard-v2-empty-panel" aria-label="Empty dashboard workspace"><span aria-hidden="true" /></Card>;
 }
 
 interface HealthCardProps { healthy: number; low: number }
