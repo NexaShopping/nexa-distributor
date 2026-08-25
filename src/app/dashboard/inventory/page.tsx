@@ -9,7 +9,7 @@ import { formatMoney } from "@/lib/money";
 import type { StockItemView } from "@/lib/types";
 import { Button, EmptyState, ErrorState, Input, Select, Spinner } from "@/components/ui";
 
-export default function InventoryPage() {
+function LegacyInventoryPage() {
   const [filters, setFilters] = useState<InventoryFilters>({});
   const [qInput, setQInput] = useState("");
   const [cursors, setCursors] = useState<string[]>([]);
@@ -47,6 +47,8 @@ export default function InventoryPage() {
     <div className="inventory-mobile-nav"><Link href="/dashboard">▦<span>Dashboard</span></Link><Link className="active" href="/dashboard/inventory">▣<span>Inventory</span></Link><Link href="/dashboard/orders">▤<span>Orders</span></Link><Link href="/dashboard/credit">⚙<span>Settings</span></Link></div>
   </div>;
 }
+
+export { default } from "./inventory-modern";
 
 function StatCard({ label, value, icon, tone }: { label: string; value: number; icon: string; tone: string }) { return <div className="inventory-stat"><div><small>{label}</small><strong>{value.toLocaleString()}</strong></div><span className={`inventory-stat-icon ${tone}`}>{icon}</span></div>; }
 

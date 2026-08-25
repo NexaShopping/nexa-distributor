@@ -92,16 +92,6 @@ function PricingForm({ item }: { item: StockItemView }) {
     <Card className="space-y-3 p-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">Pricing & listing</p>
-        <button
-          type="button"
-          onClick={toggleListed}
-          disabled={update.isPending}
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            item.isListed ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-600"
-          }`}
-        >
-          {item.isListed ? "Listed" : "Unlisted"}
-        </button>
       </div>
       <p className="text-xs text-ink-soft">
         Your price is used for customers attributed to you. Admin pricing remains the fallback when you cannot fulfil the complete cart.
@@ -132,9 +122,12 @@ function PricingForm({ item }: { item: StockItemView }) {
           <Input value={lowStockAt} onChange={(e) => setLowStockAt(e.target.value)} inputMode="numeric" />
         </div>
         {error && <p className="col-span-full text-sm text-red-600">{error}</p>}
-        <div className="col-span-full">
+        <div className="col-span-full flex flex-wrap items-center gap-2">
           <Button type="submit" size="sm" disabled={update.isPending || retailRange.isLoading || !retailRange.data}>
             {update.isPending ? "Saving…" : "Save pricing"}
+          </Button>
+          <Button type="button" size="sm" className="min-w-24" variant={item.isListed ? "secondary" : "primary"} onClick={toggleListed} disabled={update.isPending}>
+            {item.isListed ? "Listed" : "Unlisted"}
           </Button>
         </div>
       </form>
