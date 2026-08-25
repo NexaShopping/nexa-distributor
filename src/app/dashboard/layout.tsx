@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { Button, Spinner } from "@/components/ui";
+import { Spinner } from "@/components/ui";
 import { ToastProvider } from "@/components/feedback";
 import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Search, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
 import { Drawer } from "vaul";
@@ -49,6 +49,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");
   const pageHeader = getPageHeader(pathname);
+  const displayName = account?.name?.trim() || account?.phone || "Distributor";
+  const profileInitial = displayName.charAt(0).toUpperCase();
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -83,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <ToastProvider><div className="flex flex-1">
+    <ToastProvider><div className="flex w-full min-w-0 flex-1">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-hidden border-r border-line bg-surface sm:flex">
         <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
           <Image src="/logo.png" alt="" width={26} height={25} className="h-6.5 w-auto" />
@@ -115,7 +117,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex w-full min-w-0 flex-1 flex-col">
         <header className="flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:flex-nowrap sm:gap-4 sm:px-5 sm:py-0">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <Drawer.Root open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} direction="left">
@@ -157,17 +159,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
               <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
             </label>
-            <Link href="/dashboard/profile" className="hidden text-sm text-ink-soft hover:text-ink sm:inline">{account?.name ?? account?.phone}</Link>
-            <Button variant="secondary" size="sm" type="button" onClick={() => setLogoutConfirmOpen(true)} disabled={signingOut}>
-              {signingOut ? "Signing out…" : "Log out"}
-            </Button>
+            <Link href="/dashboard/profile" aria-label={`Open profile for ${displayName}`} title={displayName} className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-brand/10 text-sm font-semibold text-brand transition hover:ring-2 hover:ring-brand/20">
+              {account?.avatarUrl ? <img src={account.avatarUrl} alt="" className="h-full w-full object-cover" /> : profileInitial}
+            </Link>
           </div>
           <label className="flex h-9 basis-full items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-ink-soft focus-within:border-brand sm:hidden">
             <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
             <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
           </label>
         </header>
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-6">{children}</main>
       </div>
       {logoutConfirmOpen && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/35 p-4" role="presentation"><div role="dialog" aria-modal="true" aria-labelledby="logout-title" className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-2xl"><h2 id="logout-title" className="text-base font-semibold">Log out of NexaShopping?</h2><p className="mt-2 text-sm text-ink-soft">You’ll need to sign in again to manage your distributor account.</p><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setLogoutConfirmOpen(false)} className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-canvas">Cancel</button><button type="button" onClick={handleLogout} disabled={signingOut} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">{signingOut ? "Signing out…" : "Log out"}</button></div></div></div>}
     </div></ToastProvider>

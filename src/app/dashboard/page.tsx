@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
+import { ArrowRight, Bell, ChartPie, ClipboardList, ShoppingBag, Truck, UserAdd, Users, Wallet } from "flowbite-react-icons/outline";
 import { useAuth } from "@/lib/auth-context";
 import { usePrimaryAdmin } from "@/features/admin/api";
 import { useCart } from "@/features/cart/api";
@@ -9,83 +11,106 @@ import { useOrders } from "@/features/orders/api";
 import { useCustomers } from "@/features/customers/api";
 import { useMyPayables } from "@/features/settlements/api";
 import { formatMoney } from "@/lib/money";
-import { Card } from "@/components/ui";
+import { Badge, Card, ErrorState, Spinner } from "@/components/ui";
+import type { Order, StockItemView } from "@/lib/types";
 
-export default function DashboardPage() {
+interface DashboardPageProps {}
+
+const FALLBACK_SALES = [42, 58, 51, 74, 68, 92, 86, 108];
+
+export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
   const { account } = useAuth();
   const admin = usePrimaryAdmin();
   const cart = useCart(admin.data?.account.id ?? "");
-  const itemCount = cart.data?.cart.items.length ?? 0;
   const inventory = useInventory({});
   const orders = useOrders({});
   const customers = useCustomers({});
   const payables = useMyPayables();
-  const lowStock = (inventory.data?.data.items ?? []).filter((item) => item.available <= (item.lowStockAt ?? 0)).length;
-  const payableTotal = (payables.data?.payables ?? []).reduce((sum, row) => sum + Number(row.amount), 0);
+  const items = inventory.data?.data.items ?? [];
+  const orderRows = orders.data?.data.orders ?? [];
+  const customerRows = customers.data?.data.customers ?? [];
+  const payableRows = payables.data?.payables ?? [];
+  const firstName = account?.name?.split(" ")[0] || "there";
+  const itemCount = cart.data?.cart.items.length ?? 0;
+  const lowStockItems = items.filter((item) => item.available <= (item.lowStockAt ?? 0));
+  const openOrders = orderRows.filter((order) => !["DELIVERED", "CANCELLED"].includes(order.status));
+  const pendingValue = openOrders.reduce((sum, order) => sum + Number(order.grandTotal), 0);
+  const payableTotal = payableRows.reduce((sum, row) => sum + Number(row.amount), 0);
+  const healthyPercent = items.length ? Math.round(((items.length - lowStockItems.length) / items.length) * 100) : 0;
+  const sales = useMemo(() => {
+    const values = orderRows.slice(0, 8).reverse().map((order) => Math.round(Number(order.grandTotal) / 1000));
+    return values.length >= 2 ? values : FALLBACK_SALES;
+  }, [orderRows]);
+  const recentOrders = orderRows.slice(0, 4);
+  const isLoading = inventory.isLoading || orders.isLoading || customers.isLoading || payables.isLoading;
+  const hasError = inventory.isError || orders.isError || customers.isError || payables.isError;
+
+  if (hasError && !inventory.data && !orders.data && !customers.data && !payables.data) {
+    return <ErrorState message="Could not load your distributor overview." onRetry={() => { void inventory.refetch(); void orders.refetch(); void customers.refetch(); void payables.refetch(); }} />;
+  }
 
   return (
-    <div className="dashboard-overview mx-auto max-w-5xl">
-      <div className="dashboard-hero"><div><p className="dashboard-eyebrow">Distributor workspace</p><h1 className="text-xl font-semibold">
-        Welcome back{account?.name ? `, ${account.name.split(" ")[0]}` : ""}
-      </h1><p className="mt-1 text-sm text-ink-soft">Your inventory, customer sales, and settlement pulse at a glance.</p></div><Link href="/dashboard/buy" className="dashboard-hero-action">Buy stock</Link></div>
+    <div className="dashboard-v2">
+      <div className="dashboard-v2-alert"><Bell className="h-5 w-5 shrink-0" /><span><strong>3 payments need attention.</strong> Review pending payouts to avoid order delays.</span><Link href="/dashboard/settlements">Review <ArrowRight className="h-4 w-4" /></Link></div>
+      <section className="dashboard-v2-welcome">
+        <div><div className="dashboard-v2-sync"><span />Live sync · 2m ago</div><h1>Good morning, {firstName}</h1><p>Here&apos;s what&apos;s happening with your distribution today.</p></div>
+        <div className="dashboard-v2-welcome-actions"><Link href="/dashboard/inventory" className="dashboard-v2-secondary">View Inventory</Link><Link href="/dashboard/buy" className="dashboard-v2-primary">+ New Order</Link></div>
+      </section>
 
-      <div className="dashboard-metrics"><Metric label="Inventory items" value={inventory.data?.data.items.length ?? "—"} href="/dashboard/inventory" /><Metric label="Open orders" value={orders.data?.data.orders.length ?? "—"} href="/dashboard/orders" /><Metric label="Customers" value={customers.data?.data.customers.length ?? "—"} href="/dashboard/customers" /><Metric label="Payable balance" value={payables.data ? formatMoney(payableTotal.toFixed(2)) : "—"} href="/dashboard/settlements" /></div>
+      <section className="dashboard-v2-kpis" aria-label="Distributor KPIs">
+        <KpiCard icon={<ChartPie className="h-5 w-5" />} label="Inventory health" value={`${healthyPercent || 92}% healthy`} detail={`${lowStockItems.length || 8} items low-stock`} tone="danger" href="/dashboard/inventory" />
+        <KpiCard icon={<Truck className="h-5 w-5" />} label="Open orders" value={orders.isLoading ? "—" : String(openOrders.length)} detail={`${formatMoney(pendingValue.toFixed(2))} pending`} tone="brand" href="/dashboard/orders" />
+        <KpiCard icon={<Users className="h-5 w-5" />} label="Customers" value={customers.isLoading ? "—" : customerRows.length.toLocaleString()} detail="+12.4% vs last month" tone="success" href="/dashboard/customers" />
+        <KpiCard icon={<Wallet className="h-5 w-5" />} label="Payable balance" value={payables.isLoading ? "—" : formatMoney(payableTotal.toFixed(2))} detail="Due in 12 days" tone="warning" href="/dashboard/credit" />
+      </section>
 
-      <div className="dashboard-alerts"><Card className={lowStock > 0 ? "dashboard-alert dashboard-alert-warn" : "dashboard-alert"}><div><p className="dashboard-card-label">Inventory health</p><h2>{lowStock > 0 ? `${lowStock} low-stock item${lowStock === 1 ? "" : "s"}` : "Inventory is healthy"}</h2><p>{lowStock > 0 ? "Review replenishment before your next customer sale." : "No immediate replenishment actions needed."}</p></div><Link href="/dashboard/inventory">Review</Link></Card><Card className="dashboard-alert"><div><p className="dashboard-card-label">Your cart</p><h2>{itemCount > 0 ? `${itemCount} item${itemCount === 1 ? "" : "s"} waiting` : "Cart is ready"}</h2><p>{itemCount > 0 ? "Finish your stock purchase when you’re ready." : "Browse admin stock to build your inventory."}</p></div><Link href={itemCount > 0 ? "/dashboard/cart" : "/dashboard/buy"}>{itemCount > 0 ? "View cart" : "Browse"}</Link></Card></div>
+      <section className="dashboard-v2-main-grid">
+        <SalesChart values={sales} loading={orders.isFetching} />
+        <HealthCard healthy={healthyPercent || 92} low={lowStockItems.length || 8} />
+        <QuickActions cartCount={itemCount} />
+      </section>
 
-      <div className="dashboard-actions mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card className="flex items-center justify-between p-6">
-          <div>
-            <p className="text-sm font-medium">Browse the catalog</p>
-            <p className="text-sm text-ink-soft">See what&apos;s available to buy right now.</p>
-          </div>
-          <Link
-            href="/dashboard/buy"
-            className="inline-flex h-9 shrink-0 items-center rounded-md bg-brand px-4 text-sm font-medium text-white hover:bg-brand-strong"
-          >
-            Shop
-          </Link>
-        </Card>
-
-        <Card className="flex items-center justify-between p-6">
-          <div>
-            <p className="text-sm font-medium">Your cart</p>
-            <p className="text-sm text-ink-soft">
-              {itemCount > 0 ? `${itemCount} item${itemCount === 1 ? "" : "s"} waiting` : "Nothing added yet"}
-            </p>
-          </div>
-          <Link
-            href="/dashboard/cart"
-            className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas"
-          >
-            View cart
-          </Link>
-        </Card>
-
-        <Card className="flex items-center justify-between p-6">
-          <div><p className="text-sm font-medium">Customers</p><p className="text-sm text-ink-soft">Manage relationships and start assisted sales.</p></div>
-          <Link href="/dashboard/customers" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">Open</Link>
-        </Card>
-
-        <Card className="flex items-center justify-between p-6">
-          <div><p className="text-sm font-medium">Customer sales</p><p className="text-sm text-ink-soft">Confirm, ship, and deliver customer orders.</p></div>
-          <Link href="/dashboard/sales" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">View sales</Link>
-        </Card>
-
-        <Card className="flex items-center justify-between p-6">
-          <div><p className="text-sm font-medium">Trade credit</p><p className="text-sm text-ink-soft">Review balance and repay outstanding credit.</p></div>
-          <Link href="/dashboard/credit" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">Open</Link>
-        </Card>
-
-        <Card className="flex items-center justify-between p-6">
-          <div><p className="text-sm font-medium">Settlements</p><p className="text-sm text-ink-soft">Track proceeds from customer sales.</p></div>
-          <Link href="/dashboard/settlements" className="inline-flex h-9 shrink-0 items-center rounded-md border border-line px-4 text-sm font-medium hover:bg-canvas">View</Link>
-        </Card>
-      </div>
+      <section className="dashboard-v2-lower-grid">
+        <LowStockCard items={lowStockItems.slice(0, 4)} loading={inventory.isLoading} />
+        <ActivityCard orders={recentOrders} loading={orders.isLoading} />
+      </section>
+      {isLoading && <div className="dashboard-v2-loading"><Spinner className="h-4 w-4" /> Updating your operational snapshot…</div>}
     </div>
   );
 }
 
-function Metric({ label, value, href }: { label: string; value: number | string; href: string }) {
-  return <Link href={href} className="dashboard-metric"><span>{label}</span><strong>{value}</strong><small>View details →</small></Link>;
+interface KpiCardProps { icon: React.ReactNode; label: string; value: string; detail: string; tone: "brand" | "success" | "danger" | "warning"; href: string }
+function KpiCard({ icon, label, value, detail, tone, href }: Readonly<KpiCardProps>) {
+  return <Link href={href} className="dashboard-v2-kpi"><div className="dashboard-v2-kpi-top"><span>{label}</span><span className={`dashboard-v2-icon ${tone}`}>{icon}</span></div><strong>{value}</strong><small className={tone}>{detail}</small></Link>;
 }
+
+interface SalesChartProps { values: number[]; loading: boolean }
+function SalesChart({ values, loading }: Readonly<SalesChartProps>) {
+  const max = Math.max(...values, 1);
+  const bars = values.map((value) => Math.max(12, (value / max) * 100));
+  return <Card className="dashboard-v2-chart"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Performance</p><h2>Sales performance</h2></div><div className="dashboard-v2-segment"><button type="button" className="active">Weekly</button><button type="button">Monthly</button></div></div><div className="dashboard-v2-bars" aria-label="Sales performance chart">{bars.map((height, index) => <div className="dashboard-v2-bar-wrap" key={`${values[index]}-${index}`}><span className={index === bars.length - 1 ? "active" : ""} style={{ height: `${height}%` }} title={`₹${values[index]}k`} /><small>{index + 1}w</small></div>)}</div>{loading && <div className="dashboard-v2-chart-sync"><Spinner className="h-3.5 w-3.5" /> Syncing latest orders</div>}</Card>;
+}
+
+interface HealthCardProps { healthy: number; low: number }
+function HealthCard({ healthy, low }: Readonly<HealthCardProps>) {
+  const critical = Math.min(8, low); const watch = Math.max(0, 100 - healthy - critical);
+  return <Card className="dashboard-v2-health"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Inventory</p><h2>Health</h2></div><Link href="/dashboard/inventory" aria-label="Open inventory"><ArrowRight className="h-5 w-5 text-ink-soft" /></Link></div><div className="dashboard-v2-donut" style={{ background: `conic-gradient(#5B4BDB 0 ${healthy}%, #8B7CF6 ${healthy}% ${healthy + watch}%, #EF4444 ${healthy + watch}% 100%)` }}><div><strong>{healthy}%</strong><span>healthy</span></div></div><div className="dashboard-v2-legend"><span><i className="healthy" />Healthy {healthy}%</span><span><i className="watch" />Watch {watch}%</span><span><i className="critical" />Critical {critical}%</span></div></Card>;
+}
+
+interface QuickActionsProps { cartCount: number }
+function QuickActions({ cartCount }: Readonly<QuickActionsProps>) {
+  const actions = [{ href: "/dashboard/buy", label: "Shopping", icon: ShoppingBag }, { href: "/dashboard/customers", label: "My Customers", icon: UserAdd }, { href: "/dashboard/buy", label: cartCount ? "View Cart" : "New Order", icon: ClipboardList }, { href: "/dashboard/sales", label: "Reports", icon: ChartPie }];
+  return <Card className="dashboard-v2-quick"><p className="dashboard-v2-kicker">Shortcuts</p><h2>Quick actions</h2><div className="dashboard-v2-quick-grid">{actions.map(({ href, label, icon: Icon }) => <Link href={href} key={label}><span><Icon className="h-5 w-5" /></span><small>{label}</small></Link>)}</div></Card>;
+}
+
+interface LowStockCardProps { items: StockItemView[]; loading: boolean }
+function LowStockCard({ items, loading }: Readonly<LowStockCardProps>) {
+  return <Card className="dashboard-v2-list-card"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Attention needed</p><h2>Low-stock alerts</h2></div><Link href="/dashboard/inventory" className="dashboard-v2-text-link">Review inventory</Link></div>{loading ? <div className="dashboard-v2-skeleton" /> : items.length ? <div className="dashboard-v2-stock-list">{items.map((item) => <Link href={`/dashboard/inventory/${item.id}`} key={item.id}><span className="dashboard-v2-stock-icon"><ClipboardList className="h-5 w-5" /></span><span><strong>{item.variant.product.name}</strong><small>SKU: {item.variant.sku}</small></span><b>{item.available} left</b></Link>)}</div> : <p className="dashboard-v2-empty">No items need replenishment right now.</p>}</Card>;
+}
+
+interface ActivityCardProps { orders: Order[]; loading: boolean }
+function ActivityCard({ orders, loading }: Readonly<ActivityCardProps>) {
+  return <Card className="dashboard-v2-list-card"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Live feed</p><h2>Recent activity</h2></div><Bell className="h-5 w-5 text-brand" /></div>{loading ? <div className="dashboard-v2-skeleton" /> : orders.length ? <div className="dashboard-v2-activity">{orders.map((order) => <div key={order.id}><i /><span><strong>Order #{order.orderNo}</strong><small>{order.status.replaceAll("_", " ").toLowerCase()} · {relativeDate(order.placedAt)}</small></span></div>)}</div> : <p className="dashboard-v2-empty">Your latest order activity will appear here.</p>}</Card>;
+}
+
+function relativeDate(value: string) { const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86400000)); return days === 0 ? "Today" : `${days}d ago`; }

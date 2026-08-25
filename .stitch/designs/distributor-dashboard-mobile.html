@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>NexaShopping - Distributor Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "emerald-success": "#10B981",
+                    "surface-container-highest": "#e1e1f0",
+                    "tertiary-fixed": "#ffdbc8",
+                    "surface-container-high": "#e7e7f5",
+                    "secondary-container": "#9485ff",
+                    "on-primary-fixed-variant": "#3e28be",
+                    "error": "#ba1a1a",
+                    "background": "#fbf8ff",
+                    "outline": "#787586",
+                    "secondary-fixed": "#e5deff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface-variant": "#474554",
+                    "on-tertiary-container": "#ffd7c2",
+                    "on-secondary-fixed": "#180065",
+                    "on-secondary-container": "#2a0992",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#4330aa",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#5746d6",
+                    "on-tertiary-fixed-variant": "#753400",
+                    "outline-variant": "#c8c4d7",
+                    "on-surface": "#191b25",
+                    "tertiary-container": "#a04a00",
+                    "surface-dim": "#d9d9e7",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#150066",
+                    "on-primary-container": "#e0dbff",
+                    "amber-warning": "#F59E0B",
+                    "inverse-primary": "#c6c0ff",
+                    "primary": "#422ec2",
+                    "primary-fixed-dim": "#c6c0ff",
+                    "inverse-on-surface": "#f0effe",
+                    "surface-container": "#ededfb",
+                    "surface": "#FFFFFF",
+                    "secondary": "#5c4bc3",
+                    "on-background": "#191b25",
+                    "surface-bright": "#fbf8ff",
+                    "primary-fixed": "#e4dfff",
+                    "tertiary-fixed-dim": "#ffb68b",
+                    "slate-text": "#667085",
+                    "inverse-surface": "#2e303b",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "rose-error": "#EF4444",
+                    "tertiary": "#7b3700",
+                    "surface-variant": "#e1e1f0",
+                    "primary-container": "#5b4bdb",
+                    "secondary-fixed-dim": "#c7bfff",
+                    "surface-container-low": "#f3f2ff",
+                    "on-tertiary-fixed": "#321200",
+                    "on-tertiary": "#ffffff",
+                    "canvas": "#F8F9FC"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "sm": "12px",
+                    "lg": "48px",
+                    "xs": "4px",
+                    "margin-desktop": "32px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "xl": "80px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "label-sm": [
+                            "Manrope"
+                    ],
+                    "headline-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-sm": [
+                            "Manrope"
+                    ],
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-lg": [
+                            "Manrope"
+                    ],
+                    "display-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-md": [
+                            "Manrope"
+                    ],
+                    "headline-sm": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "headline-lg-mobile": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-md": [
+                            "Manrope"
+                    ]
+            },
+            "fontSize": {
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "12px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "60px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .tinted-shadow {
+            box-shadow: 0px 4px 20px rgba(91, 75, 219, 0.04);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas text-on-surface antialiased flex justify-center min-h-screen">
+<!-- Mobile Device Container for Design Constraints -->
+<div class="w-full max-w-[390px] bg-canvas relative shadow-2xl overflow-x-hidden pb-lg">
+<!-- NavigationDrawer (Hidden by default, semantic shell placeholder) -->
+<div class="fixed inset-y-0 left-0 z-[60] flex flex-col py-6 h-full w-80 rounded-r-xl overflow-hidden bg-surface shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden" id="sideDrawer">
+<div class="px-6 mb-6 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center font-headline-md">S</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary font-bold">Nexa Distributor</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">B2B Premium Tier</p>
+<p class="font-label-sm text-label-sm text-emerald-success mt-1">Verified Partner</p>
+</div>
+</div>
+<button class="p-2 text-on-surface-variant active:scale-95 duration-100" onclick="toggleDrawer()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<!-- Dashboard (Active) -->
+<a class="flex items-center gap-4 bg-secondary-container text-on-secondary-container rounded-full px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-label-md text-label-md">Shopping</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Orders</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">My Customers</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Payouts</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Credits</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+<div class="h-px bg-outline-variant my-2 mx-4"></div>
+<a class="flex items-center gap-4 text-primary px-4 py-3 mx-2 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+<span class="font-label-md text-label-md font-bold">New Order</span>
+</a>
+<a class="flex items-center gap-4 text-error px-4 py-3 mx-2 hover:bg-error-container hover:text-on-error-container transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</nav>
+</div>
+<!-- Drawer Overlay -->
+<div class="fixed inset-0 bg-on-surface/40 z-50 hidden md:hidden" id="drawerOverlay" onclick="toggleDrawer()"></div>
+<!-- 1. Header: TopAppBar -->
+<header class="fixed top-0 w-full max-w-[390px] z-40 bg-surface shadow-sm border-b border-outline-variant flex justify-between items-center px-4 h-16 transition-colors">
+<div class="flex items-center gap-3">
+<button class="p-2 -ml-2 text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-100 rounded-full h-11 w-11 flex items-center justify-center" onclick="toggleDrawer()">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary tracking-tight">Nexa Distribute</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-100 rounded-full h-11 w-11 flex items-center justify-center relative">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container text-primary flex items-center justify-center font-label-md font-bold ml-1">S</div>
+</div>
+</header>
+<!-- Main Content Padding for Header -->
+<main class="pt-[88px] px-margin-mobile flex flex-col gap-6">
+<!-- 3. Welcome Card -->
+<section class="bg-surface rounded-xl p-md tinted-shadow border border-surface-container-highest relative overflow-hidden">
+<!-- Sync skeleton -->
+<div class="absolute top-4 right-4 flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary animate-ping"></div>
+<span class="font-label-sm text-label-sm text-slate-text">Syncing...</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-1">Good morning, Satya</h2>
+<p class="font-body-sm text-body-sm text-slate-text mb-6">Here's what's happening with your distribution today.</p>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary rounded-lg h-11 flex items-center justify-center font-label-md active:scale-95 transition-transform">
+                        New Order
+                    </button>
+<button class="flex-1 border border-primary-fixed-dim text-primary rounded-lg h-11 flex items-center justify-center font-label-md active:scale-95 transition-transform bg-transparent hover:bg-surface-container-low">
+                        View Inventory
+                    </button>
+</div>
+</section>
+<!-- 7. Alert Banner -->
+<div class="bg-amber-warning/10 border border-amber-warning/20 rounded-lg p-3 flex items-start gap-3 w-full">
+<span class="material-symbols-outlined text-amber-warning mt-0.5">warning</span>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-on-surface mb-0.5">3 payments need attention</h4>
+<p class="font-body-sm text-body-sm text-slate-text">Review pending payouts to avoid delays.</p>
+</div>
+<button class="text-amber-warning p-1 active:scale-95"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+<!-- 4. KPI Grid -->
+<section class="grid grid-cols-2 gap-4">
+<!-- Inventory -->
+<div class="bg-surface rounded-xl p-4 tinted-shadow border border-surface-container-highest flex flex-col justify-between min-h-[110px]">
+<div class="flex items-center gap-2 text-slate-text mb-2">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+<span class="font-label-sm text-label-sm">Inventory Health</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold">92%</div>
+<div class="font-label-sm text-label-sm text-rose-error flex items-center mt-1">
+<span class="material-symbols-outlined text-[14px] mr-1">arrow_downward</span>
+                            8 low-stock
+                        </div>
+</div>
+</div>
+<!-- Open Orders -->
+<div class="bg-surface rounded-xl p-4 tinted-shadow border border-surface-container-highest flex flex-col justify-between min-h-[110px]">
+<div class="flex items-center gap-2 text-slate-text mb-2">
+<span class="material-symbols-outlined text-[18px]">shopping_cart</span>
+<span class="font-label-sm text-label-sm">Open Orders</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold">24</div>
+<div class="font-label-sm text-label-sm text-slate-text mt-1">
+                            ₹1,84,600 pending
+                        </div>
+</div>
+</div>
+<!-- Customers -->
+<div class="bg-surface rounded-xl p-4 tinted-shadow border border-surface-container-highest flex flex-col justify-between min-h-[110px]">
+<div class="flex items-center gap-2 text-slate-text mb-2">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span class="font-label-sm text-label-sm">Customers</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold">1,248</div>
+<div class="font-label-sm text-label-sm text-emerald-success flex items-center mt-1">
+<span class="material-symbols-outlined text-[14px] mr-1">arrow_upward</span>
+                            +12.4%
+                        </div>
+</div>
+</div>
+<!-- Payable -->
+<div class="bg-surface rounded-xl p-4 tinted-shadow border border-surface-container-highest flex flex-col justify-between min-h-[110px]">
+<div class="flex items-center gap-2 text-slate-text mb-2">
+<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Payable</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold">₹86,420</div>
+<div class="font-label-sm text-label-sm text-slate-text mt-1">
+                            due in 12 days
+                        </div>
+</div>
+</div>
+</section>
+<!-- 10. Quick Actions -->
+<section class="bg-surface rounded-xl p-md tinted-shadow border border-surface-container-highest">
+<h3 class="font-label-md text-label-md text-on-surface mb-4 font-bold uppercase tracking-wider text-slate-text">Quick Actions</h3>
+<div class="grid grid-cols-4 gap-2">
+<button class="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 h-20">
+<div class="w-10 h-10 rounded-full bg-primary-container/30 text-primary flex items-center justify-center mb-2">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface text-center leading-tight">Shopping</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 h-20">
+<div class="w-10 h-10 rounded-full bg-secondary-container/30 text-secondary flex items-center justify-center mb-2">
+<span class="material-symbols-outlined">group_add</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface text-center leading-tight">Customers</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 h-20">
+<div class="w-10 h-10 rounded-full bg-emerald-success/20 text-emerald-success flex items-center justify-center mb-2">
+<span class="material-symbols-outlined">add_circle</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface text-center leading-tight">New Order</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 h-20">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center mb-2">
+<span class="material-symbols-outlined">description</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface text-center leading-tight">Reports</span>
+</button>
+</div>
+</section>
+</main>
+</div>
+<!-- Script for Drawer Toggle -->
+<script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('sideDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            
+            if (drawer.classList.contains('-translate-x-full')) {
+                drawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+    </script>
+</body></html>

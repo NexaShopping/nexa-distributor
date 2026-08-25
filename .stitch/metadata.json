@@ -1,0 +1,24 @@
+{
+  "projectId": "611146010874628502",
+  "title": "NexaShopping Distributor Dashboard",
+  "deviceType": "DESKTOP_AND_MOBILE",
+  "lastSyncTime": "2026-08-25T00:00:00+05:30",
+  "screens": {
+    "distributor-dashboard-desktop": {
+      "id": "2555f0b3dac046e1a242106827af59d3",
+      "label": "NexaShopping | Distributor Dashboard",
+      "sourceScreen": "projects/611146010874628502/screens/2555f0b3dac046e1a242106827af59d3",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 2048
+    },
+    "distributor-dashboard-mobile": {
+      "id": "4b382eb395514e3ca7aaf3a60d731b05",
+      "label": "NexaShopping | Mobile Dashboard",
+      "sourceScreen": "projects/611146010874628502/screens/4b382eb395514e3ca7aaf3a60d731b05",
+      "deviceType": "MOBILE",
+      "width": 780,
+      "height": 1768
+    }
+  }
+}
