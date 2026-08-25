@@ -8,12 +8,22 @@ import type { StockItemView } from "@/lib/types";
 export interface StorefrontFilters {
   sellerAccountId: string;
   q?: string;
+  category?: string;
+  availability?: "in_stock" | "low_stock" | "out_of_stock";
+  minPrice?: string;
+  maxPrice?: string;
+  sort?: "popular" | "price_asc" | "price_desc" | "newest";
 }
 
 function queryString(filters: StorefrontFilters, cursor?: string) {
   const params = new URLSearchParams();
   params.set("sellerAccountId", filters.sellerAccountId);
   if (filters.q) params.set("q", filters.q);
+  if (filters.category) params.set("category", filters.category);
+  if (filters.availability) params.set("availability", filters.availability);
+  if (filters.minPrice) params.set("minPrice", filters.minPrice);
+  if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+  if (filters.sort) params.set("sort", filters.sort);
   if (cursor) params.set("cursor", cursor);
   return params.toString();
 }
