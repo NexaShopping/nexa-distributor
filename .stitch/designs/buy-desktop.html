@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buy from Admin - Nexa Shopping</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700&amp;family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#9d4300",
+                        "surface-bright": "#fff8f6",
+                        "surface-container-high": "#efe6e4",
+                        "on-secondary-fixed": "#301400",
+                        "secondary-container": "#fd933d",
+                        "surface-lowest": "#FFFFFF",
+                        "primary-fixed": "#ffdbca",
+                        "warning-bg": "#FEF9C3",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e9e1df",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#ffb690",
+                        "primary-container": "#f97316",
+                        "on-secondary-container": "#693300",
+                        "success-bg": "#DCFCE7",
+                        "on-secondary-fixed-variant": "#713700",
+                        "inverse-primary": "#ffb690",
+                        "on-surface": "#1e1b1a",
+                        "surface-dim": "#e1d8d6",
+                        "primary": "#9d4300",
+                        "surface": "#fff8f6",
+                        "tertiary-container": "#c49200",
+                        "secondary-fixed-dim": "#ffb783",
+                        "warning-yellow": "#854d0e",
+                        "surface-container": "#f5ecea",
+                        "on-primary-fixed": "#341100",
+                        "outline": "#8c7164",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#783200",
+                        "inverse-surface": "#342f2e",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f8efed",
+                        "on-surface-muted": "rgba(41, 37, 36, 0.7)",
+                        "secondary-fixed": "#ffdcc5",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "background": "#fff8f6",
+                        "secondary": "#944a00",
+                        "on-surface-variant": "#584237",
+                        "tertiary-fixed": "#ffdf9f",
+                        "tertiary": "#795900",
+                        "surface-container-low": "#fbf2f0",
+                        "on-background": "#1e1b1a",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-primary-container": "#582200",
+                        "surface-variant": "#e9e1df",
+                        "brand-cream": "#FFF7ED",
+                        "on-tertiary-container": "#422f00",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "success-green": "#166534",
+                        "outline-variant": "#e0c0b1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "xxl": "64px",
+                        "gutter": "24px",
+                        "md": "16px",
+                        "container-max": "1440px",
+                        "xs": "4px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "base": "4px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Epilogue"],
+                        "body-sm": ["Manrope"],
+                        "headline-sm": ["Epilogue"],
+                        "body-lg": ["Manrope"],
+                        "headline-md": ["Epilogue"],
+                        "body-md": ["Manrope"],
+                        "label-caps": ["Manrope"],
+                        "display-lg-mobile": ["Epilogue"]
+                    },
+                    fontSize: {
+                        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-sm": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+                        "headline-sm": ["24px", { lineHeight: "1.4", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "700" }],
+                        "display-lg-mobile": ["36px", { lineHeight: "1.2", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.brand-cream'); }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased flex">
+<!-- SideNavBar -->
+<nav class="w-64 h-screen fixed left-0 top-0 border-r border-outline-variant/10 bg-surface-lowest shadow-[0_4px_20px_rgba(41,37,36,0.04)] z-50 flex flex-col p-md hidden md:flex">
+<div class="mb-8 px-4 flex flex-col gap-1">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Nexa Shopping</h1>
+<span class="font-label-caps text-label-caps text-on-surface-muted uppercase tracking-widest">Distributor Portal</span>
+</div>
+<button class="w-full bg-primary-container text-white py-3 rounded-lg font-bold mb-8 hover:bg-surface-tint transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+            New Order
+        </button>
+<div class="flex-1 flex flex-col gap-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors hover:bg-brand-cream rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="dashboard" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-brand-cream rounded-lg font-bold scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-body-md text-body-md">Products</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors hover:bg-brand-cream rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="shopping_cart" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors hover:bg-brand-cream rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="group" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-body-md text-body-md">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors hover:bg-brand-cream rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="payments" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span class="font-body-md text-body-md">Payouts</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors hover:bg-brand-cream rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="analytics" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors hover:bg-brand-cream rounded-lg group mt-auto" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="settings" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen relative">
+<!-- TopNavBar -->
+<header class="h-16 w-full sticky top-0 z-40 bg-background/80 backdrop-blur-md flex justify-between items-center px-lg">
+<div class="flex-1 flex items-center gap-4">
+<div class="relative w-96 hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-muted" data-icon="search" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-lowest border border-outline-variant/30 rounded-full focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-muted shadow-sm transition-all" placeholder="Search entire catalog..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high/50 rounded-full transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="notifications" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high/50 rounded-full transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="help_outline" style="font-variation-settings: 'FILL' 0;">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/20 ml-2 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all">
+<img alt="Distributor Profile" class="w-full h-full object-cover" data-alt="A portrait of a professional individual representing a distributor profile, lit with warm soft light against a clean bright background, studio photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdKLnmL_0_7l-Y7uxYzONzTj0wCQKoalWV7dFe1JNAHWk3QIGTcnnImDTldTIpW-Mk9S4ds_b39427ygkFKI6xJQEfRz26BZ_dQpdSxtRmN4OGjZnLXYGyjtm6eQ3wV1voRLN1yhPrUIjSS6vTA3CFVQm6fxq9Ay-RlORWu-m8sCanR3jMUh1_EnxxPkZabQXm6SxqAho0tDit245ZQ7mRxg3hr6F81sI9_AhD3WCAPaq5JwgTOtg6"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-gutter max-w-container-max w-full mx-auto pb-24">
+<!-- Header & Breadcrumbs -->
+<div class="mb-8">
+<nav class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-muted mb-2">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+<span class="text-on-surface font-semibold">Buy from Admin</span>
+</nav>
+<h1 class="font-headline-md text-headline-md text-on-surface">Wholesale Catalog</h1>
+<p class="font-body-md text-body-md text-on-surface-muted mt-1">Browse and purchase inventory directly from Nexa central supply.</p>
+</div>
+<!-- Filters & Categories Bar -->
+<div class="bg-surface-lowest rounded-xl shadow-[0_4px_20px_rgba(41,37,36,0.04)] p-md mb-8 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center border border-outline-variant/10">
+<!-- Category Nav -->
+<div class="flex overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto hide-scrollbar gap-2">
+<button class="px-4 py-2 rounded-lg bg-primary-container text-white font-bold font-body-sm text-body-sm whitespace-nowrap shadow-sm">All Products</button>
+<button class="px-4 py-2 rounded-lg bg-brand-cream text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Electronics</button>
+<button class="px-4 py-2 rounded-lg bg-brand-cream text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Fashion</button>
+<button class="px-4 py-2 rounded-lg bg-brand-cream text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Home &amp; Living</button>
+<button class="px-4 py-2 rounded-lg bg-brand-cream text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Beauty</button>
+</div>
+<!-- Refined Filters -->
+<div class="flex flex-wrap gap-3 w-full lg:w-auto items-center">
+<div class="relative">
+<select class="appearance-none pl-4 pr-10 py-2 bg-surface-lowest border border-outline-variant/30 rounded-lg focus:outline-none focus:border-primary font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
+<option>Availability</option>
+<option>In Stock</option>
+<option>Pre-order</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-muted pointer-events-none" data-icon="expand_more" style="font-variation-settings: 'FILL' 0;">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none pl-4 pr-10 py-2 bg-surface-lowest border border-outline-variant/30 rounded-lg focus:outline-none focus:border-primary font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
+<option>Price Range</option>
+<option>Under ₹1,000</option>
+<option>₹1,000 - ₹5,000</option>
+<option>Above ₹5,000</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-muted pointer-events-none" data-icon="expand_more" style="font-variation-settings: 'FILL' 0;">expand_more</span>
+</div>
+<div class="relative border-l border-outline-variant/20 pl-3">
+<select class="appearance-none pl-4 pr-10 py-2 bg-brand-cream border-none rounded-lg focus:outline-none focus:ring-1 focus:ring-primary font-body-sm text-body-sm text-on-surface font-semibold cursor-pointer">
+<option>Sort: Popular</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Newest Arrivals</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none" data-icon="sort" style="font-variation-settings: 'FILL' 0;">sort</span>
+</div>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
+<!-- Product Card 1 -->
+<div class="bg-surface-lowest rounded-xl shadow-[0_4px_20px_rgba(41,37,36,0.04)] hover:shadow-[0_12px_32px_rgba(249,115,22,0.08)] border border-transparent hover:border-primary-fixed-dim/30 transition-all duration-300 flex flex-col group overflow-hidden">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden">
+<img alt="Nexa SoundPro X1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A premium wireless speaker, the Nexa SoundPro X1, styled elegantly on a wooden table with soft afternoon sunlight streaming through a window, warm minimal aesthetic, high quality studio photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZUyBrA_gjc4xunaapaJOmJ0zdXTQPGq-I6nRQEBu8-8I8ZSd11zUrpgCjveX88BoLR9f1nSpwEu-1VizEVINuku5lU0MuMulINDth-oJXLGjrcLFF5R1Fwg0Wb4Q0mIP4QREoq4GzzXHVlB3KNjmvl29ur5Rcns6FrmyWbUbrnmynETh7kf7y57rBobLcCns-2qgNArdGvZ94wLHqn7ZwXnXb8aUTuPNpp8Imguv8pGEvRwFtLC2S"/>
+<div class="absolute top-3 left-3 bg-success-bg/90 backdrop-blur text-success-green px-2 py-1 rounded-md font-label-caps text-label-caps uppercase flex items-center gap-1 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-success-green"></span>
+                            Available
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-[18px] text-on-surface font-bold leading-tight">Nexa SoundPro X1</h3>
+<span class="font-label-caps text-[10px] text-on-surface-muted bg-surface-container-high px-1.5 py-0.5 rounded text-right">SKU: NX-AUD-1024</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-muted mb-4 line-clamp-2">Premium 360° wireless home speaker with deep bass.</p>
+<div class="mt-auto">
+<div class="mb-3">
+<span class="font-label-caps text-label-caps text-on-surface-muted uppercase">Purchase Price</span>
+<div class="font-headline-sm text-[20px] text-primary font-bold">₹2,499 <span class="font-body-sm text-body-sm text-on-surface-muted font-normal">/ unit</span></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center border border-outline-variant/30 rounded-lg bg-surface-lowest">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<input class="w-10 h-8 p-0 text-center border-none focus:ring-0 font-body-sm text-body-sm text-on-surface font-semibold bg-transparent" min="1" type="number" value="1"/>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+<button class="flex-1 bg-primary-container hover:bg-surface-tint text-white py-2 rounded-lg font-bold font-body-sm text-body-sm transition-colors shadow-sm">
+                                    Buy Now
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-lowest rounded-xl shadow-[0_4px_20px_rgba(41,37,36,0.04)] hover:shadow-[0_12px_32px_rgba(249,115,22,0.08)] border border-transparent hover:border-primary-fixed-dim/30 transition-all duration-300 flex flex-col group overflow-hidden">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden">
+<img alt="Nexa Studio Cans" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A pair of elegant over-ear headphones, Nexa Studio Cans, resting next to a coffee cup on a light oak desk, warm inviting lifestyle photography, shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP2gyKNulfWP2wF624QKlewjmSU137RvT8-C_QQ8-jneqVRiNGYSuONfQZF6N5ObFgrrAvhNrxBshu1e8OscQ_1Yi5_fuEjOY78MjmW6U82FzCotXAk6jYCTCrtfCfhMGEGH6Zy_ouOzfrgDd6PWPzF7jXeW0ifjnH1YVkoy__WvHwd1EP4f8Fjyq5c47YnsQNM54QODaHYk2wxErfwjZTJI3aAo1Q4Sktfu1RdMFG_-Tf68YcNlkh"/>
+<div class="absolute top-3 left-3 bg-success-bg/90 backdrop-blur text-success-green px-2 py-1 rounded-md font-label-caps text-label-caps uppercase flex items-center gap-1 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-success-green"></span>
+                            Available
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-[18px] text-on-surface font-bold leading-tight">Nexa Studio Cans</h3>
+<span class="font-label-caps text-[10px] text-on-surface-muted bg-surface-container-high px-1.5 py-0.5 rounded text-right">SKU: NX-AUD-2055</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-muted mb-4 line-clamp-2">Noise-cancelling over-ear headphones with plush leather cups.</p>
+<div class="mt-auto">
+<div class="mb-3">
+<span class="font-label-caps text-label-caps text-on-surface-muted uppercase">Purchase Price</span>
+<div class="font-headline-sm text-[20px] text-primary font-bold">₹4,200 <span class="font-body-sm text-body-sm text-on-surface-muted font-normal">/ unit</span></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center border border-outline-variant/30 rounded-lg bg-surface-lowest">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<input class="w-10 h-8 p-0 text-center border-none focus:ring-0 font-body-sm text-body-sm text-on-surface font-semibold bg-transparent" min="1" type="number" value="1"/>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+<button class="flex-1 bg-primary-container hover:bg-surface-tint text-white py-2 rounded-lg font-bold font-body-sm text-body-sm transition-colors shadow-sm">
+                                    Buy Now
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface-lowest rounded-xl shadow-[0_4px_20px_rgba(41,37,36,0.04)] hover:shadow-[0_12px_32px_rgba(249,115,22,0.08)] border border-transparent hover:border-primary-fixed-dim/30 transition-all duration-300 flex flex-col group overflow-hidden opacity-80 grayscale-[20%]">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden">
+<img alt="Nexa Hub Lite" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A smart home display hub, Nexa Hub Lite, sitting on a kitchen counter next to fresh ingredients, bright morning light, warm lifestyle product shot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa8uMWr-I5vXuQUrslJ0rneEKemO5TRJ_cAkCcF4SSNF5-LcftOafkhHDC27q8Kns7WRp8t-34aUGddfjWRxekzCxFYKp6JQv83-V27Zl99AqA1RXfwr6Xca2hFJ4206crqYW5zpGmEMLQdsicum4_Y6RSe1wzHCxHtzrHUPu5rkMOOp7aXs5Pq2VA5Wm_6jRPxcileznzYHv8_uGrXs9wMcvO3W35PL4hp2e5S3AbVFp_hj7jt44l"/>
+<div class="absolute top-3 left-3 bg-warning-bg/90 backdrop-blur text-warning-yellow px-2 py-1 rounded-md font-label-caps text-label-caps uppercase flex items-center gap-1 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-warning-yellow"></span>
+                            Low Stock
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-[18px] text-on-surface font-bold leading-tight">Nexa Hub Lite</h3>
+<span class="font-label-caps text-[10px] text-on-surface-muted bg-surface-container-high px-1.5 py-0.5 rounded text-right">SKU: NX-SMT-004</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-muted mb-4 line-clamp-2">Compact smart home assistant with 5" display.</p>
+<div class="mt-auto">
+<div class="mb-3">
+<span class="font-label-caps text-label-caps text-on-surface-muted uppercase">Purchase Price</span>
+<div class="font-headline-sm text-[20px] text-primary font-bold">₹1,850 <span class="font-body-sm text-body-sm text-on-surface-muted font-normal">/ unit</span></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center border border-outline-variant/30 rounded-lg bg-surface-lowest">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<input class="w-10 h-8 p-0 text-center border-none focus:ring-0 font-body-sm text-body-sm text-on-surface font-semibold bg-transparent" max="5" min="1" type="number" value="1"/>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+<button class="flex-1 bg-brand-cream border border-primary-container text-primary hover:bg-primary-fixed-dim/20 py-2 rounded-lg font-bold font-body-sm text-body-sm transition-colors">
+                                    Add to Cart
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-surface-lowest rounded-xl shadow-[0_4px_20px_rgba(41,37,36,0.04)] hover:shadow-[0_12px_32px_rgba(249,115,22,0.08)] border border-transparent hover:border-primary-fixed-dim/30 transition-all duration-300 flex flex-col group overflow-hidden">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden">
+<img alt='Nexa View 8"' class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sleek 8-inch smart tablet display, Nexa View 8, angled slightly on a minimalistic cream-colored desk mat, professional studio lighting, warm highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM-lhj7SroiCzUKIHg2dxejg4xVjIPzPj2OCqDdKhkBQayDP-p1PQACx9Q-zwBhbDhxphZfEZYuiT5-C21lJsBRe6PxTgty367lXUk10P8RwWmAA_x-SBHA555hoDt-ZlyXF5qpKJ8yUShZDczkTa4nmQuIB36ukVXYyVXVCZzr8hcDRViSWa3Qw3Gi-zV_3OGxve3i_6zHETHVlhIDmloTpG6iQe3bsI4OKcXh9PSpjoWETEgscYP"/>
+<div class="absolute top-3 left-3 bg-success-bg/90 backdrop-blur text-success-green px-2 py-1 rounded-md font-label-caps text-label-caps uppercase flex items-center gap-1 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-success-green"></span>
+                            Available
+                        </div>
+<div class="absolute top-3 right-3 bg-secondary-container/90 backdrop-blur text-on-secondary-container px-2 py-1 rounded-md font-label-caps text-label-caps uppercase shadow-sm">
+                            New
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-[18px] text-on-surface font-bold leading-tight">Nexa View 8"</h3>
+<span class="font-label-caps text-[10px] text-on-surface-muted bg-surface-container-high px-1.5 py-0.5 rounded text-right">SKU: NX-SMT-008</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-muted mb-4 line-clamp-2">High-res control panel for the modern connected home.</p>
+<div class="mt-auto">
+<div class="mb-3">
+<span class="font-label-caps text-label-caps text-on-surface-muted uppercase">Purchase Price</span>
+<div class="font-headline-sm text-[20px] text-primary font-bold">₹5,999 <span class="font-body-sm text-body-sm text-on-surface-muted font-normal">/ unit</span></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center border border-outline-variant/30 rounded-lg bg-surface-lowest">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<input class="w-10 h-8 p-0 text-center border-none focus:ring-0 font-body-sm text-body-sm text-on-surface font-semibold bg-transparent" min="1" type="number" value="1"/>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+<button class="flex-1 bg-primary-container hover:bg-surface-tint text-white py-2 rounded-lg font-bold font-body-sm text-body-sm transition-colors shadow-sm">
+                                    Buy Now
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination (Mock) -->
+<div class="mt-12 flex justify-center items-center gap-2">
+<button class="w-10 h-10 rounded-lg border border-outline-variant/30 flex items-center justify-center text-on-surface-muted hover:bg-surface-lowest hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left" style="font-variation-settings: 'FILL' 0;">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-primary text-white font-bold font-body-sm flex items-center justify-center shadow-sm">1</button>
+<button class="w-10 h-10 rounded-lg border border-outline-variant/30 bg-surface-lowest flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors font-body-sm">2</button>
+<button class="w-10 h-10 rounded-lg border border-outline-variant/30 bg-surface-lowest flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors font-body-sm">3</button>
+<span class="text-on-surface-muted mx-1">...</span>
+<button class="w-10 h-10 rounded-lg border border-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-surface-lowest hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</body></html>

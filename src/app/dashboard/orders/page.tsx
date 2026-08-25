@@ -7,7 +7,7 @@ import { formatMoney } from "@/lib/money";
 import { Button, EmptyState, ErrorState, Select, Spinner } from "@/components/ui";
 import type { OrderStatus } from "@/lib/types";
 
-const STATUS_TONES: Record<OrderStatus, string> = {
+const LEGACY_STATUS_TONES: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: "bg-amber-50 text-amber-700",
   CONFIRMED: "bg-blue-50 text-blue-700",
   SHIPPED: "bg-indigo-50 text-indigo-700",
@@ -15,7 +15,7 @@ const STATUS_TONES: Record<OrderStatus, string> = {
   CANCELLED: "bg-neutral-100 text-neutral-600",
 };
 
-export default function OrdersPage() {
+function LegacyOrdersPage() {
   const [filters, setFilters] = useState<OrderFilters>({});
   const [cursors, setCursors] = useState<string[]>([]);
   const cursor = cursors.at(-1);
@@ -80,7 +80,7 @@ export default function OrdersPage() {
                       </Link>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_TONES[o.status]}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${LEGACY_STATUS_TONES[o.status]}`}>
                         {o.status.toLowerCase().replace("_", " ")}
                       </span>
                     </td>
@@ -111,3 +111,5 @@ export default function OrdersPage() {
     </div>
   );
 }
+
+export { default } from "./orders-history";

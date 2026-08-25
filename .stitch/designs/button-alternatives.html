@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NexaShopping Button Alternatives</title>
+  <style>
+    :root { --brand:#f2751f; --brand-strong:#d9601c; --ink:#2b211d; --ink-soft:#76665e; --canvas:#fff7ed; --surface:#fffdf9; --line:#eadfd8; --success:#16834b; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-width:320px; color:var(--ink); background:var(--canvas); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .page { max-width:1180px; margin:0 auto; padding:48px 28px 64px; }
+    .eyebrow { margin:0 0 8px; color:var(--brand-strong); font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(30px,5vw,48px); letter-spacing:-.04em; line-height:1.05; }
+    .intro { max-width:680px; margin:14px 0 34px; color:var(--ink-soft); font-size:16px; line-height:1.6; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .option { display:flex; min-width:0; flex-direction:column; padding:24px; border:1px solid var(--line); border-radius:18px; background:var(--surface); box-shadow:0 12px 30px rgba(74,42,24,.06); }
+    .option.recommended { border-color:#f4b98f; box-shadow:0 14px 34px rgba(242,117,31,.13); }
+    .option-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .option h2 { margin:0; font-size:20px; letter-spacing:-.02em; }
+    .option p { min-height:42px; margin:8px 0 24px; color:var(--ink-soft); font-size:13px; line-height:1.5; }
+    .badge { border-radius:999px; padding:6px 9px; color:var(--brand-strong); background:#fff0e6; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; }
+    .stage { display:flex; min-height:150px; flex-wrap:wrap; align-items:center; gap:14px; padding:22px; border-radius:14px; background:#fff8f2; }
+    button { font:inherit; cursor:pointer; }
+    .btn { display:inline-flex; min-width:0; align-items:center; justify-content:center; gap:8px; border:1px solid transparent; white-space:nowrap; font-weight:700; transition:transform .18s ease,background .18s ease,box-shadow .18s ease; }
+    .btn:hover { transform:translateY(-1px); }
+    .primary { color:#fff; background:var(--brand); box-shadow:0 8px 16px rgba(242,117,31,.2); }
+    .primary:hover { background:var(--brand-strong); }
+    .secondary { color:var(--brand-strong); border-color:var(--brand); background:#fff; }
+    .ghost { color:var(--brand-strong); background:transparent; }
+    .icon { width:40px; padding:0; aspect-ratio:1; border-radius:50%; }
+    .loading { color:#fff; background:var(--brand); }
+    .loading::before { width:13px; height:13px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:50%; content:""; animation:spin .8s linear infinite; }
+    .disabled { color:#a99b93; background:#eee6e1; cursor:not-allowed; }
+    .meta { display:flex; justify-content:space-between; gap:12px; margin-top:18px; color:var(--ink-soft); font-size:12px; }
+    .spec { font-weight:700; color:var(--ink); }
+    .one .btn { min-height:40px; border-radius:8px; padding:0 15px; font-size:13px; }
+    .two .btn { min-height:44px; border-radius:10px; padding:0 19px; font-size:14px; }
+    .two .icon { padding:0; }
+    .three .btn { min-height:48px; border-radius:12px; padding:0 22px; font-size:15px; }
+    .three .icon { padding:0; }
+    .four .btn { min-height:40px; border-radius:6px; padding:0 17px; font-size:14px; font-weight:650; }
+    .four .primary { box-shadow:none; }
+    .four .icon { padding:0; border-radius:6px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (max-width:720px) { .page { padding:32px 16px 48px; } .grid { grid-template-columns:1fr; } .option { padding:20px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">NexaShopping · Distributor UI</p>
+    <h1>Choose your button language</h1>
+    <p class="intro">Four responsive button directions using the existing orange palette. Each card shows the same states so you can compare size, font weight, radius, and emphasis in context.</p>
+    <section class="grid" aria-label="Button alternatives">
+      <article class="option one">
+        <div class="option-head"><div><h2>01 · Compact Utility</h2><p>Dense and efficient for data-heavy screens and frequent actions.</p></div></div>
+        <div class="stage"><button class="btn primary">New order</button><button class="btn secondary">View inventory</button><button class="btn ghost">Cancel</button><button class="btn primary icon" aria-label="Add">+</button></div>
+        <div class="meta"><span>40px · 13px · 8px radius</span><span class="spec">Fast &amp; compact</span></div>
+      </article>
+      <article class="option two recommended">
+        <div class="option-head"><div><h2>02 · Balanced Premium</h2><p>Comfortable proportions with a quiet lift for the primary action.</p></div><span class="badge">Recommended</span></div>
+        <div class="stage"><button class="btn primary">New order</button><button class="btn secondary">View inventory</button><button class="btn ghost">Cancel</button><button class="btn primary icon" aria-label="Add">+</button></div>
+        <div class="meta"><span>44px · 14px · 10px radius</span><span class="spec">Premium balance</span></div>
+      </article>
+      <article class="option three">
+        <div class="option-head"><div><h2>03 · Bold Action</h2><p>High-visibility controls for purchase flows and revenue-driving actions.</p></div></div>
+        <div class="stage"><button class="btn primary">New order</button><button class="btn secondary">View inventory</button><button class="btn loading">Saving</button><button class="btn primary icon" aria-label="Add">+</button></div>
+        <div class="meta"><span>48px · 15px · 12px radius</span><span class="spec">Strong CTA</span></div>
+      </article>
+      <article class="option four">
+        <div class="option-head"><div><h2>04 · Minimal Editorial</h2><p>Sharper, quieter controls with a more composed admin-tool character.</p></div></div>
+        <div class="stage"><button class="btn primary">New order</button><button class="btn secondary">View inventory</button><button class="btn disabled" disabled>Unavailable</button><button class="btn primary icon" aria-label="Add">+</button></div>
+        <div class="meta"><span>40px · 14px · 6px radius</span><span class="spec">Quiet precision</span></div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

@@ -13,6 +13,7 @@ import { Drawer } from "vaul";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/buy", label: "Shopping", icon: Store },
+  { href: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
   { href: "/dashboard/customers", label: "Customers", icon: Users },
   { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
@@ -28,7 +29,7 @@ function getPageHeader(pathname: string) {
   if (pathname.startsWith("/dashboard/inventory/")) return { title: "Inventory details", description: "Review stock, pricing, and availability for this item." };
   if (pathname.startsWith("/dashboard/inventory")) return { title: "Inventory", description: "Manage your available products and stock." };
   if (pathname.startsWith("/dashboard/orders/")) return { title: "Purchase details", description: "Review payment, delivery, and order items." };
-  if (pathname.startsWith("/dashboard/orders")) return { title: "My purchases", description: "Everything you’ve bought from admin." };
+  if (pathname.startsWith("/dashboard/orders")) return { title: "Orders", description: "Track purchases, payments, and fulfillment in one place." };
   if (pathname.startsWith("/dashboard/customers/") && pathname.endsWith("/sale")) return { title: "Assisted sale", description: "Create a sale for one of your customers." };
   if (pathname.startsWith("/dashboard/customers/")) return { title: "Customer details", description: "Review customer information and sale history." };
   if (pathname.startsWith("/dashboard/customers")) return { title: "Customers", description: "Your private customer list and assisted-sale relationships." };

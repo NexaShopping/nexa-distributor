@@ -20,7 +20,7 @@ const STATUS_TONES: Record<OrderStatus, string> = {
 
 const CANCELLABLE: OrderStatus[] = ["AWAITING_PAYMENT", "CONFIRMED"];
 
-export default function OrderDetailPage() {
+function LegacyOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError, refetch } = useOrder(id);
 
@@ -37,6 +37,8 @@ export default function OrderDetailPage() {
 
   return <OrderDetail order={data.order} />;
 }
+
+export { default } from "./order-detail-modern";
 
 function OrderDetail({ order }: { order: NonNullable<ReturnType<typeof useOrder>["data"]>["order"] }) {
   const cancel = useCancelOrder(order.id);
