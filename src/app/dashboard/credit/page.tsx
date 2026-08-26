@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { ApiError } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { Button, ErrorState, Input, Spinner } from "@/components/ui";
 import { PhonePeMark } from "@/components/phonepe-mark";
@@ -128,7 +128,10 @@ export default function CreditPage() {
       </div>
 
       <div className="credit-modern__section">
-        <h2>Credit ledger</h2>
+        <div className="credit-modern__section-head">
+          <h2>Credit ledger</h2>
+          <LedgerExport accountId={accountId} />
+        </div>
         <div className="credit-modern__table-card">
           {ledger.isLoading ? (
             <div className="credit-modern__loading"><Spinner className="h-5 w-5" />Loading ledger…</div>
@@ -156,6 +159,38 @@ export default function CreditPage() {
         </div>
       </div>
     </section>
+  );
+}
+
+// A statement export for reconciliation with admin — exact period, not just "whatever's
+// currently loaded" (matches the same pattern as the orders sales-register export).
+function LedgerExport({ accountId }: { accountId: string }) {
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const [from, setFrom] = useState(new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
+  const [to, setTo] = useState(todayIso);
+  const [exporting, setExporting] = useState(false);
+
+  async function exportLedger() {
+    if (exporting || from > to || !accountId) return;
+    setExporting(true);
+    try {
+      const blob = await api.download(`/credit/${accountId}/ledger/export?from=${from}&to=${to}`);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `credit-ledger-${from}-to-${to}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch { /* error already surfaced globally */ }
+    finally { setExporting(false); }
+  }
+
+  return (
+    <div className="credit-modern__export">
+      <label>From<input type="date" value={from} max={to} onChange={(event) => setFrom(event.target.value)} aria-label="Ledger export from date" /></label>
+      <label>To<input type="date" value={to} min={from} max={todayIso} onChange={(event) => setTo(event.target.value)} aria-label="Ledger export to date" /></label>
+      <Button size="sm" variant="secondary" onClick={exportLedger} disabled={exporting || from > to}>{exporting ? "Exporting…" : "Export CSV"}</Button>
+    </div>
   );
 }
 

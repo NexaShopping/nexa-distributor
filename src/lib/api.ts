@@ -80,10 +80,39 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return (await requestFull<T>(path, init)).data;
 }
 
+// For endpoints that respond with a raw file (e.g. CSV/PDF exports) instead of the standard
+// { success, data } JSON envelope — request() would fail trying to res.json() a CSV body.
+async function download(path: string): Promise<Blob> {
+  if (!BASE_URL) throw new ApiError("INTERNAL", "NEXT_PUBLIC_API_URL is not set", 0);
+  const token = tokenStore.get();
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}/api/v1${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to reach the server. Please try again.";
+    emitApiEvent({ tone: "error", message });
+    throw new ApiError("INTERNAL", message, 0);
+  }
+  if (!res.ok) {
+    let message = res.statusText || "Request failed";
+    let code: ApiErrorCode = "INTERNAL";
+    try {
+      const body = (await res.json()) as ApiResponse<never>;
+      if (body.success === false) { message = body.error.message; code = body.error.code; }
+    } catch { /* non-JSON error body */ }
+    emitApiEvent({ tone: "error", message });
+    throw new ApiError(code, message, res.status);
+  }
+  return res.blob();
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
   // Same as `get`, but also surfaces `meta` (cursor pagination) — for list endpoints.
   getPage: <T>(path: string) => requestFull<T>(path),
+  download,
   post: <T>(path: string, data?: unknown) =>
     request<T>(path, { method: "POST", body: data === undefined ? undefined : JSON.stringify(data) }),
   patch: <T>(path: string, data?: unknown) =>

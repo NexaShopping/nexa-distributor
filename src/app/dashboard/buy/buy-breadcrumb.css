@@ -1,0 +1,2 @@
+.buy-desktop-heading{display:block;margin-bottom:14px}.buy-breadcrumb{display:flex;align-items:center;gap:8px;color:#9a877d;font-size:12px}.buy-breadcrumb a{color:#9a877d;text-decoration:none}.buy-breadcrumb a:hover{color:#ad4c13}.buy-breadcrumb strong{color:#5b4a42;font-weight:600}
+@media(max-width:639px){.buy-desktop-heading{display:none}}

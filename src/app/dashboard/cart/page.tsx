@@ -3,13 +3,20 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ArrowRight } from "flowbite-react-icons/outline";
 import { usePrimaryAdmin } from "@/features/admin/api";
-import { useCart, useRemoveCartItem, useUpdateCartItem } from "@/features/cart/api";
+import { useAddToCart, useCart, useRemoveCartItem, useUpdateCartItem } from "@/features/cart/api";
+import { useStorefront } from "@/features/storefront/api";
 import { usePlaceOrder } from "@/features/orders/api";
 import { formatMoney } from "@/lib/money";
 import { ApiError } from "@/lib/api";
 import { Button, Card, EmptyState, ErrorState, Input, Label, Spinner } from "@/components/ui";
 import type { OrderAddress } from "@/lib/types";
+import "./cart-modern.css";
+import "./cart-modern-overrides.css";
+import "./cart-modern-final.css";
+import "./cart-modern-grid-fix.css";
+import "./cart-checkout.css";
 
 const EMPTY_ADDRESS: OrderAddress = {
   contactName: "",
@@ -25,6 +32,8 @@ export default function CartPage() {
   const sellerAccountId = admin.data?.account.id ?? "";
   const { data, isLoading, isError, refetch } = useCart(sellerAccountId);
   const cart = data?.cart;
+  const recommendations = useStorefront({ sellerAccountId, sort: "popular" });
+  const recommendedItems = (recommendations.data?.data.items ?? []).filter((item) => !cart?.items.some((line) => line.variantId === item.variant.id)).slice(0, 4);
   const [showCheckout, setShowCheckout] = useState(false);
 
   if (admin.isLoading || isLoading) {
@@ -39,7 +48,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="cart-modern">
       <nav className="flex items-center gap-2 text-sm text-ink-soft">
         <Link href="/dashboard" className="hover:text-ink">Dashboard</Link><span>›</span><strong className="font-medium text-ink">Cart</strong>
       </nav>
@@ -50,13 +59,9 @@ export default function CartPage() {
         </div>
       ) : (
         <>
-          <div className="mt-5 space-y-3">
-            {cart.items.map((line) => (
-              <CartLineRow key={line.id} line={line} sellerAccountId={sellerAccountId} />
-            ))}
-          </div>
-
-          <Card className="mt-5 p-4">
+          <div className="cart-modern__grid"><Card className="cart-modern__items"><div className="cart-modern__section-head"><div><h1>Your cart</h1><p>{cart.items.length} wholesale items selected</p></div><Link href="/dashboard/buy">Continue shopping</Link></div><div className="cart-modern__line-list">{cart.items.map((line) => <CartLineRow key={line.id} line={line} sellerAccountId={sellerAccountId} />)}</div></Card>
+          <Card className="cart-modern__summary">
+            <div className="cart-modern__section-head"><div><h2>Order summary</h2><p>Wholesale checkout</p></div></div>
             <dl className="space-y-1.5 text-sm">
               <Row label="Subtotal" value={cart.subtotal} />
               <Row label="Discount" value={cart.discountTotal} />
@@ -66,19 +71,24 @@ export default function CartPage() {
                 <Row label="Total" value={cart.grandTotal} bold />
               </div>
             </dl>
-          </Card>
+            <div className="cart-modern__secure">Secure checkout · Your payment details are protected.</div>
 
-          {!showCheckout ? (
-            <Button className="mt-5 w-full" onClick={() => setShowCheckout(true)}>
-              Proceed to checkout
-            </Button>
-          ) : (
-            <CheckoutForm sellerAccountId={sellerAccountId} onCancel={() => setShowCheckout(false)} />
-          )}
+          <Button className="cart-modern__checkout" onClick={() => setShowCheckout(true)}>Proceed to checkout</Button></Card></div>
+          {showCheckout && <CheckoutForm sellerAccountId={sellerAccountId} onCancel={() => setShowCheckout(false)} />}
+          <RecommendedProducts items={recommendedItems} sellerAccountId={sellerAccountId} loading={recommendations.isLoading} />
         </>
       )}
+      {cart.items.length === 0 && <RecommendedProducts items={recommendedItems} sellerAccountId={sellerAccountId} loading={recommendations.isLoading} />}
     </div>
   );
+}
+
+function RecommendedProducts({ items, sellerAccountId, loading }: { items: import("@/lib/types").StockItemView[]; sellerAccountId: string; loading: boolean }) {
+  return <section className="cart-modern__recommendations"><div className="cart-modern__section-head"><div><h2>Recommended for you</h2><p>Popular stock other distributors are adding</p></div><Link href="/dashboard/buy">View all <ArrowRight /></Link></div>{loading ? <div className="cart-modern__recommendation-loading"><Spinner className="h-4 w-4" /> Loading recommendations</div> : items.length ? <div className="cart-modern__recommendation-grid">{items.map((item) => <RecommendedCard key={item.id} item={item} sellerAccountId={sellerAccountId} />)}</div> : <p className="cart-modern__muted">No recommendations available right now.</p>}</section>;
+}
+function RecommendedCard({ item, sellerAccountId }: { item: import("@/lib/types").StockItemView; sellerAccountId: string }) {
+  const add = useAddToCart(sellerAccountId); const media = item.variant.product.media?.[0]; const price = item.discountPrice ?? item.sellPrice;
+  return <article className="cart-modern__recommendation"><Link href={`/dashboard/buy/${item.id}`} className="cart-modern__recommendation-image">{media ? <img src={media.url} alt={media.alt ?? item.variant.product.name} /> : <span>{item.variant.product.name.charAt(0)}</span>}</Link><div className="cart-modern__recommendation-copy"><strong>{item.variant.product.name}</strong><small>SKU: {item.variant.sku}</small><b>{formatMoney(price)}</b></div><Button size="sm" disabled={add.isPending || item.available <= 0} onClick={() => add.mutate({ variantId: item.variant.id, quantity: 1 })}>Add</Button></article>;
 }
 
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
@@ -102,15 +112,15 @@ function CartLineRow({
   const overAvailable = line.quantity > line.available;
 
   return (
-    <Card className="flex flex-wrap items-center gap-4 p-4">
-      <div className="min-w-0 flex-1">
+    <Card className="cart-modern__row">
+      <div className="cart-modern__thumb" aria-hidden="true"><span>{line.name.charAt(0)}</span></div><div className="cart-modern__row-copy">
         <p className="font-medium">{line.name}</p>
         <p className="font-mono text-xs text-ink-soft">{line.sku}</p>
         {overAvailable && (
           <p className="mt-1 text-xs text-amber-700">Only {line.available} in stock — reduce quantity before checkout.</p>
         )}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="cart-modern__stepper">
         <button
           type="button"
           onClick={() => update.mutate({ id: line.id, quantity: Math.max(1, line.quantity - 1) })}
@@ -129,7 +139,7 @@ function CartLineRow({
           +
         </button>
       </div>
-      <p className="w-24 text-right text-sm font-medium">{formatMoney(line.lineTotal)}</p>
+      <p className="cart-modern__row-price"><strong>{formatMoney(line.lineTotal)}</strong><small>{formatMoney(line.unitPrice)} / unit</small></p>
       <button
         type="button"
         onClick={() => remove.mutate(line.id)}
@@ -174,8 +184,8 @@ function CheckoutForm({ sellerAccountId, onCancel }: { sellerAccountId: string; 
   const canSubmit = address.contactName && address.contactPhone && address.line1 && address.city && address.state && address.pincode;
 
   return (
-    <Card className="mt-5 space-y-4 p-5">
-      <p className="text-sm font-medium">Shipping address</p>
+    <Card className="cart-modern__checkout-card mt-5 space-y-4 p-5">
+      <div><p className="text-sm font-semibold">Shipping & payment</p><p className="mt-1 text-xs text-ink-soft">Enter delivery details and choose how you want to pay.</p></div>
       <form onSubmit={submit} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <Label>Contact name</Label>
@@ -201,13 +211,7 @@ function CheckoutForm({ sellerAccountId, onCancel }: { sellerAccountId: string; 
           <Label>Pincode</Label>
           <Input {...field("pincode")} required />
         </div>
-        <div className="sm:col-span-2">
-          <Label>Payment method</Label>
-          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as typeof paymentMethod)} className="h-10 w-full rounded-md border border-line bg-surface px-3 text-sm">
-            <option value="COD">Cash on delivery</option>
-            <option value="PHONEPE">PhonePe</option>
-            <option value="CREDIT">Trade credit</option>
-          </select>
+        <div className="sm:col-span-2"><Label>Payment method</Label><div className="cart-modern__payment-options"><label className={paymentMethod === "COD" ? "is-selected" : ""}><input type="radio" name="payment" value="COD" checked={paymentMethod === "COD"} onChange={() => setPaymentMethod("COD")} /><span>Cash on delivery</span><small>Pay when your order arrives</small></label><label className={paymentMethod === "PHONEPE" ? "is-selected" : ""}><input type="radio" name="payment" value="PHONEPE" checked={paymentMethod === "PHONEPE"} onChange={() => setPaymentMethod("PHONEPE")} /><span><i className="cart-modern__phonepe">पे</i>PhonePe</span><small>Fast, secure online payment</small></label><label className={paymentMethod === "CREDIT" ? "is-selected" : ""}><input type="radio" name="payment" value="CREDIT" checked={paymentMethod === "CREDIT"} onChange={() => setPaymentMethod("CREDIT")} /><span><i className="cart-modern__credit-logo">N</i>Nexa Credit</span><small>Use your available trade credit</small></label></div>
           {paymentMethod === "CREDIT" && <p className="mt-1 text-xs text-ink-soft">The order uses your available trade-credit balance and is due according to your credit terms.</p>}
         </div>
         {error && <p className="text-sm text-red-600 sm:col-span-2">{error}</p>}

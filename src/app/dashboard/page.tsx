@@ -31,6 +31,8 @@ export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
   const customerRows = customers.data?.data.customers ?? [];
   const payableRows = payables.data?.payables ?? [];
   const firstName = account?.name?.split(" ")[0] || "there";
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const itemCount = cart.data?.cart.items.length ?? 0;
   const lowStockItems = items.filter((item) => item.available <= (item.lowStockAt ?? 0));
   const openOrders = orderRows.filter((order) => !["DELIVERED", "CANCELLED"].includes(order.status));
@@ -53,7 +55,7 @@ export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
     <div className="dashboard-v2">
       <div className="dashboard-v2-alert"><Bell className="h-5 w-5 shrink-0" /><span><strong>3 payments need attention.</strong> Review pending payouts to avoid order delays.</span><Link href="/dashboard/settlements">Review <ArrowRight className="h-4 w-4" /></Link></div>
       <section className="dashboard-v2-welcome">
-        <div><div className="dashboard-v2-sync"><span />Live sync · 2m ago</div><h1>Good morning, {firstName}</h1><p>Here&apos;s what&apos;s happening with your distribution today.</p></div>
+        <div><div className="dashboard-v2-sync"><span />Live sync · 2m ago</div><h1>{greeting}, {firstName}</h1><p>Here&apos;s what&apos;s happening with your distribution today.</p></div>
         <div className="dashboard-v2-welcome-actions"><Link href="/dashboard/inventory" className="dashboard-v2-secondary">View Inventory</Link><Link href="/dashboard/buy" className="dashboard-v2-primary">+ New Order</Link></div>
       </section>
 

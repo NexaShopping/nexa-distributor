@@ -20,7 +20,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const push = useCallback((tone: ToastTone, message: string) => {
     const id = nextId;
     setNextId((value) => value + 1);
-    setToasts((current) => [...current.slice(-2), { id, tone, message }]);
+    // One toast at a time — a new one replaces whatever's showing, rather than stacking, so
+    // rapid actions (e.g. repeated add-to-cart clicks) never pile several up at once.
+    setToasts([{ id, tone, message }]);
     window.setTimeout(() => setToasts((current) => current.filter((toast) => toast.id !== id)), 4500);
   }, [nextId]);
 
@@ -31,7 +33,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       <div className={cn("fixed inset-x-0 top-0 z-[100] h-0.5 origin-left bg-brand transition-transform duration-300", isBusy ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0")} aria-hidden="true" />
       {children}
-      <div className="pointer-events-none fixed right-4 top-20 z-[90] flex w-[min(92vw,380px)] flex-col gap-2" aria-live="polite">
+      <div className="pointer-events-none fixed right-4 top-2 z-[100] flex w-[min(92vw,200px)] flex-col gap-2" aria-live="polite">
         {toasts.map((toast) => (
           <div key={toast.id} className={cn("pointer-events-auto flex items-start gap-3 rounded-xl border bg-surface px-4 py-3 text-sm shadow-xl", toast.tone === "success" ? "border-emerald-200" : "border-red-200")}>
             {toast.tone === "success" ? <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /> : <ExclamationCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />}

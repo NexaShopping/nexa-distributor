@@ -1,0 +1,2 @@
+.cart-modern__row .font-medium{display:block}.cart-modern__thumb{display:grid;place-items:center;color:#c35418;font-size:20px;font-weight:700}.cart-modern__row-copy{display:grid;gap:0}.cart-modern__row-copy .mt-1{grid-column:1/-1}
+.cart-modern__summary dl{width:100%}.cart-modern__summary dl>div{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;width:100%}.cart-modern__summary dl>div dt{min-width:0}.cart-modern__summary dl>div dd{margin:0;padding-left:24px;text-align:right;white-space:nowrap}

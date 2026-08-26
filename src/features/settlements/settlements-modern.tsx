@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Card, EmptyState, ErrorState, Select, Spinner, Button } from "@/components/ui";
 import { formatMoney } from "@/lib/money";
 import { useMyPayables, useMyPayouts } from "@/features/settlements/api";
+import "./settlements-modern-header.css";
 
 export function SettlementsModern() {
   const payables = useMyPayables(); const payouts = useMyPayouts(); const [status, setStatus] = useState("ALL"); const [query, setQuery] = useState("");

@@ -1,14 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { useInventory } from "@/features/inventory/api";
+import { useCatalogCategories } from "@/features/catalog/api";
 import { useAddToCart, useCart, useRemoveCartItem, useUpdateCartItem } from "@/features/cart/api";
 import { AssistedCheckout } from "@/features/customers/assisted-checkout";
 import { Button, Card, EmptyState, ErrorState, Input, Spinner } from "@/components/ui";
 import type { CartLine, CustomerRelationship, StockItemView } from "@/lib/types";
+import "./assisted-sale-controls.css";
+import "./assisted-sale-toolbar-fix.css";
+import "./assisted-sale-alignment.css";
+import "./assisted-sale-alignment-final.css";
 
 export function AssistedSale({ relationship }: { relationship: CustomerRelationship }) {
   const { account } = useAuth();
@@ -17,14 +23,15 @@ export function AssistedSale({ relationship }: { relationship: CustomerRelations
   const [searchInput, setSearchInput] = useState("");
   const [q, setQ] = useState<string | undefined>();
   const [showCheckout, setShowCheckout] = useState(false);
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState("");
   const [availability, setAvailability] = useState("all");
   const [sort, setSort] = useState("popular");
   const inventory = useInventory({ isListed: true, q });
+  const categoriesQuery = useCatalogCategories();
   const cartQuery = useCart(sellerAccountId, buyerAccountId);
   const items = (inventory.data?.data.items ?? []).filter((item) => item.isListed && item.available > 0)
     .filter((item) => availability === "all" || (availability === "low" ? item.lowStockAt !== null && item.available <= item.lowStockAt : item.available > (item.lowStockAt ?? 0)))
-    .filter((item) => category === "All" || item.variant.product.name.toLowerCase().includes(category.toLowerCase()) || item.variant.product.brand.toLowerCase().includes(category.toLowerCase()))
+    .filter((item) => category === "" || item.variant.product.slug === category || item.variant.product.name.toLowerCase().includes(category.replaceAll("-", " ").toLowerCase()))
     .sort((a, b) => sort === "price" ? Number(a.discountPrice ?? a.sellPrice) - Number(b.discountPrice ?? b.sellPrice) : a.variant.product.name.localeCompare(b.variant.product.name));
   const cart = cartQuery.data?.cart;
 
@@ -36,7 +43,7 @@ export function AssistedSale({ relationship }: { relationship: CustomerRelations
   }
 
   return (
-    <div className="assisted-sale-modern"><div className="assisted-sale-customer"><strong>{(relationship.displayName || relationship.customer.name || "Customer").slice(0, 2).toUpperCase()}</strong><span>{relationship.displayName || relationship.customer.name || "Customer"}</span><small>{relationship.customer.phone || "Phone not recorded"}</small><em>Active</em><button type="button">Change customer</button></div>
+    <div className="assisted-sale-modern"><div className="assisted-sale-customer"><strong>{(relationship.displayName || relationship.customer.name || "Customer").slice(0, 2).toUpperCase()}</strong><span>{relationship.displayName || relationship.customer.name || "Customer"}</span><small>{relationship.customer.phone || "Phone not recorded"}</small><em>Active</em><Link href="/dashboard/customers" className="assisted-sale-change-customer">Change customer</Link></div>
     <div className="assisted-sale-grid grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section>
         <div className="assisted-sale-title"><h1>Select products</h1><p>Add items from your listed inventory to this sale.</p></div><form
@@ -48,7 +55,7 @@ export function AssistedSale({ relationship }: { relationship: CustomerRelations
         >
           <Input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search your listed stock…" />
         </form>
-          <div className="assisted-sale-chips">{["All", "Sensors", "Networking", "Appliances"].map((chip) => <button type="button" className={category === chip ? "is-active" : ""} key={chip} onClick={() => setCategory(chip)}>{chip}</button>)}</div><div className="assisted-sale-selects"><select aria-label="Availability" value={availability} onChange={(event) => setAvailability(event.target.value)}><option value="all">Availability</option><option value="in-stock">In stock</option><option value="low">Low stock</option></select><select aria-label="Sort products" value={sort} onChange={(event) => setSort(event.target.value)}><option value="popular">Sort: Popular</option><option value="price">Price: Low to high</option><option value="name">Name</option></select></div>
+          <div className="assisted-sale-chips">{[{ name: "All items", slug: "" }, ...(categoriesQuery.data?.categories ?? [])].map((chip) => <button type="button" className={category === chip.slug ? "is-active" : ""} key={chip.slug || "all"} onClick={() => setCategory(chip.slug)}>{chip.name}</button>)}</div><div className="assisted-sale-selects"><select aria-label="Availability" value={availability} onChange={(event) => setAvailability(event.target.value)}><option value="all">Availability</option><option value="in-stock">In stock</option><option value="low">Low stock</option></select><select aria-label="Sort products" value={sort} onChange={(event) => setSort(event.target.value)}><option value="popular">Sort: Popular</option><option value="price">Price: Low to high</option><option value="name">Name</option></select></div>
         {items.length === 0 ? (
           <EmptyState title="No sellable stock found" hint="List in-stock items from My inventory before starting this sale." />
         ) : (

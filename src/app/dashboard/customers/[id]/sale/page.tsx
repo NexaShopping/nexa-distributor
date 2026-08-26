@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useCustomer } from "@/features/customers/api";
 import { AssistedSale } from "@/features/customers/assisted-sale";
 import { ErrorState, Spinner } from "@/components/ui";
+import "../../customer-sale-spacing.css";
 
 export default function AssistedSalePage() {
   const { id } = useParams<{ id: string }>();
@@ -16,10 +17,6 @@ export default function AssistedSalePage() {
   return (
     <div className="assisted-sale-page mx-auto max-w-7xl">
       <Link href={`/dashboard/customers/${id}`} className="text-sm text-ink-soft hover:text-ink">← Back to customer</Link>
-      <div className="assisted-sale-heading mt-3 mb-5">
-        <h1 className="text-xl font-semibold">Assisted sale</h1>
-        <p className="mt-1 text-sm text-ink-soft">Selling from your inventory to {customer.data.customer.displayName || customer.data.customer.customer.name || customer.data.customer.customer.phone}.</p>
-      </div>
       <AssistedSale relationship={customer.data.customer} />
     </div>
   );

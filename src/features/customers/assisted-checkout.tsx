@@ -31,7 +31,6 @@ export function AssistedCheckout({
     country: "IN",
   });
   const [error, setError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"PHONEPE" | "CREDIT">("CREDIT");
 
   function field<K extends keyof OrderAddress>(key: K) {
     return {
@@ -49,7 +48,6 @@ export function AssistedCheckout({
         sellerAccountId,
         buyerAccountId: relationship.customer.id,
         channel: "DISTRIBUTOR_ASSISTED",
-        paymentMethod,
         shippingAddress: address,
       });
       router.push(`/dashboard/sales/${result.order.id}`);
@@ -99,7 +97,7 @@ export function AssistedCheckout({
           <Label>Country</Label>
           <Input {...field("country")} readOnly />
         </div>
-        <div className="assisted-checkout-payment sm:col-span-2"><Label>Payment method</Label><div className="assisted-payment-options"><button type="button" className={paymentMethod === "PHONEPE" ? "is-selected" : ""} onClick={() => setPaymentMethod("PHONEPE")}><strong>PhonePe / UPI</strong><small>Pay securely online</small></button><button type="button" className={paymentMethod === "CREDIT" ? "is-selected" : ""} onClick={() => setPaymentMethod("CREDIT")}><strong>Trade Credit</strong><small>Use available credit balance</small></button></div></div>
+        <div className="sm:col-span-2"><p className="text-xs text-ink-soft">Payment is collected by you directly (cash on delivery) — online payment for assisted sales isn&apos;t available yet.</p></div>
         {error && <p className="text-sm text-red-600 sm:col-span-2">{error}</p>}
         <div className="flex gap-2 sm:col-span-2">
           <Button type="submit" disabled={!canSubmit || place.isPending}>

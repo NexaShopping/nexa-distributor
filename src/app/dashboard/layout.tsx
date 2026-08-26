@@ -3,19 +3,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/ui";
+import { usePrimaryAdmin } from "@/features/admin/api";
+import { useCart, useUpdateCartItem } from "@/features/cart/api";
+import { formatMoney } from "@/lib/money";
 import { ToastProvider } from "@/components/feedback";
-import { ArrowRight, Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
+import { Bars, CartPlus, ChartPie, Close, Cog, Home, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
 import { Drawer } from "vaul";
 import "./sidebar.css";
+import "./cart-header.css";
+import "./cart-header-overrides.css";
+import "./dashboard-header-overrides.css";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/buy", label: "Shopping", icon: Store },
-  { href: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
-  { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
+  { href: "/dashboard/inventory", label: "Inventory", icon: StackIcon },
+  { href: "/dashboard/orders", label: "Orders", icon: OrdersIcon },
   { href: "/dashboard/customers", label: "Customers", icon: Users },
   { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
   { href: "/dashboard/sales", label: "Sales", icon: ChartPie },
@@ -44,11 +50,14 @@ function getPageHeader(pathname: string) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { status, account, logout } = useAuth();
+  const admin = usePrimaryAdmin();
+  const cart = useCart(admin.data?.account.id ?? "");
   const router = useRouter();
   const pathname = usePathname();
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const pageHeader = getPageHeader(pathname);
   const displayName = account?.name?.trim() || account?.phone || "Distributor";
   const profileInitial = displayName.charAt(0).toUpperCase();
@@ -95,7 +104,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
         <div className="distributor-sidebar__footer">
-          <Link href="/dashboard/customers" className="distributor-sidebar__new-order"><CartPlus className="h-4 w-4" />New order<ArrowRight className="h-4 w-4" /></Link>
           <div className="distributor-sidebar__account"><Link href="/dashboard/profile" className="distributor-sidebar__account-avatar">{profileInitial}</Link><Link href="/dashboard/profile" className="distributor-sidebar__account-copy"><strong>{displayName}</strong><small>View profile</small></Link><button type="button" onClick={() => setLogoutConfirmOpen(true)} aria-label="Log out"><Close className="h-4 w-4" /></button></div>
         </div>
       </aside>
@@ -126,18 +134,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     })}
                   </nav>
                   <div className="distributor-sidebar__footer distributor-sidebar__footer--mobile">
-                    <Drawer.Close asChild><Link href="/dashboard/customers" className="distributor-sidebar__new-order"><CartPlus className="h-4 w-4" />New order<ArrowRight className="h-4 w-4" /></Link></Drawer.Close>
                     <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="distributor-sidebar__logout"><Close className="h-4 w-4" />Log out</button>
                   </div>
                 </Drawer.Content>
               </Drawer.Portal>
             </Drawer.Root>
-            <div className="min-w-0">
+            <div className={`min-w-0 ${pathname.includes("/customers/") && pathname.endsWith("/sale") ? "dashboard-page-title--hidden" : ""}`}>
               <p className="truncate text-sm font-semibold tracking-tight text-ink sm:text-base">{pageHeader.title}</p>
               <p className="hidden max-w-2xl truncate text-xs text-ink-soft sm:block">{pageHeader.description}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
+            <CartHeader cart={cart.data?.cart} sellerAccountId={admin.data?.account.id ?? ""} open={cartOpen} onToggle={() => setCartOpen((open) => !open)} onClose={() => setCartOpen(false)} />
             <Link href="/dashboard/profile" aria-label={`Open profile for ${displayName}`} title={displayName} className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-brand/10 text-sm font-semibold text-brand transition hover:ring-2 hover:ring-brand/20">
               {account?.avatarUrl ? <img src={account.avatarUrl} alt="" className="h-full w-full object-cover" /> : profileInitial}
             </Link>
@@ -148,6 +156,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {logoutConfirmOpen && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/35 p-4" role="presentation"><div role="dialog" aria-modal="true" aria-labelledby="logout-title" className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-2xl"><h2 id="logout-title" className="text-base font-semibold">Log out of NexaShopping?</h2><p className="mt-2 text-sm text-ink-soft">You’ll need to sign in again to manage your distributor account.</p><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setLogoutConfirmOpen(false)} className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-canvas">Cancel</button><button type="button" onClick={handleLogout} disabled={signingOut} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60">{signingOut ? "Signing out…" : "Log out"}</button></div></div></div>}
     </div></ToastProvider>
   );
+}
+
+function CartHeader({ cart, sellerAccountId, open, onToggle, onClose }: { cart?: import("@/lib/types").CartView; sellerAccountId: string; open: boolean; onToggle: () => void; onClose: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const updateCart = useUpdateCartItem(sellerAccountId);
+  useEffect(() => { if (!open) return; const close = (event: MouseEvent) => { if (ref.current && !ref.current.contains(event.target as Node)) onClose(); }; document.addEventListener("mousedown", close); return () => document.removeEventListener("mousedown", close); }, [open, onClose]);
+  const count = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+  return <div className="header-cart" ref={ref}><button type="button" className="header-cart__button" aria-label={`Cart, ${count} items`} aria-expanded={open} onClick={onToggle}><CartPlus className="h-4 w-4" />{count > 0 && <span>{count > 99 ? "99+" : count}</span>}</button>{open && <div className="header-cart__popover"><div className="header-cart__head"><div><strong>Your cart</strong><small>{count} {count === 1 ? "item" : "items"}</small></div><Link href="/dashboard/cart" onClick={onClose}>View cart</Link></div>{cart?.items.length ? <div className="header-cart__items">{cart.items.map((item) => <div className="header-cart__item" key={item.id}><div className="header-cart__item-copy"><strong>{item.name}</strong><small>{item.sku}</small><div className="header-cart__quantity"><button type="button" aria-label={`Decrease ${item.name} quantity`} disabled={updateCart.isPending || item.quantity <= 1} onClick={() => void updateCart.mutateAsync({ id: item.id, quantity: item.quantity - 1 })}>−</button><span>{item.quantity}</span><button type="button" aria-label={`Increase ${item.name} quantity`} disabled={updateCart.isPending || item.quantity >= item.available} onClick={() => void updateCart.mutateAsync({ id: item.id, quantity: item.quantity + 1 })}>+</button></div></div><b>{formatMoney(item.lineTotal)}</b></div>)}</div> : <div className="header-cart__empty">Your cart is empty.<Link href="/dashboard/buy" onClick={onClose}>Browse shopping</Link></div>}{cart?.items.length ? <div className="header-cart__total"><span>Subtotal</span><strong>{formatMoney(cart.subtotal)}</strong></div> : null}</div>}</div>;
 }
 
 function HomeIcon({ className }: { className?: string }) {
