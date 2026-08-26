@@ -282,3 +282,4 @@ export interface DistributorPayout { id: string; distributorAccountId: string; a
 
 export interface OrderCheckoutPayment { merchantOrderId: string; status: "PENDING" | "SUCCESS"; redirectUrl: string; }
 export interface OrderPaymentStatus { merchantOrderId: string; providerStatus: "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED"; paymentStatus: "UNPAID" | "PENDING" | "PAID"; orderStatus: OrderStatus; redirectUrl: string | null; expiresAt: string | null; verifiedAt: string | null; }
+export interface Invoice { invoiceNo: string; pdfUrl: string; issuedAt: string; }

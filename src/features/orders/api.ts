@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Order, OrderAddress, OrderCheckoutPayment, OrderPaymentStatus, OrderStatus } from "@/lib/types";
+import type { Invoice, Order, OrderAddress, OrderCheckoutPayment, OrderPaymentStatus, OrderStatus } from "@/lib/types";
 
 // Typed wrappers over src/lib/api.ts + the TanStack Query hooks the orders screens use.
 // A distributor is always the buyer here (buying from admin) — role=buyer is the default and
@@ -67,6 +67,17 @@ export function useOrderPaymentStatus(id: string, enabled = true) {
     enabled: enabled && Boolean(id),
     retry: false,
     staleTime: 0,
+  });
+}
+
+// Only meaningful once an order is DELIVERED — the server generates the invoice at that
+// transition, so calling this earlier just 404s. Pass `enabled` from the order's own status.
+export function useOrderInvoice(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["order-invoice", id],
+    queryFn: () => api.get<{ invoice: Invoice }>(`/orders/${id}/invoice`),
+    enabled: enabled && Boolean(id),
+    retry: false,
   });
 }
 

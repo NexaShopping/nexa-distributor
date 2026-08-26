@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ApiError } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { useCancelOrder, useConfirmOrder, useDeliverOrder, useShipOrder } from "@/features/orders/api";
+import { InvoiceDownload } from "@/features/orders/invoice-download";
 import { Button, Card } from "@/components/ui";
 import type { Order, OrderStatus } from "@/lib/types";
 
@@ -46,9 +47,12 @@ export function SalesOrderDetail({ order }: { order: Order }) {
           <h1 className="text-xl font-semibold">{order.orderNo}</h1>
           <p className="mt-1 text-sm text-ink-soft">Customer sale placed {new Date(order.placedAt).toLocaleString()}</p>
         </div>
-        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_TONES[order.status]}`}>
-          {order.status.toLowerCase().replaceAll("_", " ")}
-        </span>
+        <div className="flex items-center gap-2">
+          <InvoiceDownload orderId={order.id} ready={order.status === "SHIPPED" || order.status === "DELIVERED"} />
+          <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_TONES[order.status]}`}>
+            {order.status.toLowerCase().replaceAll("_", " ")}
+          </span>
+        </div>
       </div>
 
       {(order.status === "AWAITING_PAYMENT" || order.status === "CONFIRMED" || order.status === "SHIPPED") && (

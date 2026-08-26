@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/ui";
 import { ToastProvider } from "@/components/feedback";
-import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
+import { ArrowRight, Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
 import { Drawer } from "vaul";
+import "./sidebar.css";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -17,7 +18,7 @@ const NAV = [
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
   { href: "/dashboard/customers", label: "Customers", icon: Users },
   { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
-  { href: "/dashboard/sales", label: "Reports", icon: ChartPie },
+  { href: "/dashboard/sales", label: "Sales", icon: ChartPie },
   { href: "/dashboard/credit", label: "Credits", icon: Cog },
   { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
@@ -34,7 +35,7 @@ function getPageHeader(pathname: string) {
   if (pathname.startsWith("/dashboard/customers/")) return { title: "Customer details", description: "Review customer information and sale history." };
   if (pathname.startsWith("/dashboard/customers")) return { title: "Customers", description: "Your private customer list and assisted-sale relationships." };
   if (pathname.startsWith("/dashboard/sales/")) return { title: "Sale details", description: "Review the customer sale and settlement status." };
-  if (pathname.startsWith("/dashboard/sales")) return { title: "Reports & analytics", description: "Track customer sales fulfilled from your inventory." };
+  if (pathname.startsWith("/dashboard/sales")) return { title: "Sales", description: "Track customer sales fulfilled from your inventory." };
   if (pathname.startsWith("/dashboard/settlements")) return { title: "Settlements", description: "Track customer-sale proceeds released by NexaShopping." };
   if (pathname.startsWith("/dashboard/credit")) return { title: "Trade credit", description: "Track your balance, due charges, and repayments." };
   if (pathname.startsWith("/dashboard/profile")) return { title: "Profile", description: "Manage your distributor account details." };
@@ -73,14 +74,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ToastProvider><div className="flex h-screen w-full min-w-0 flex-1 overflow-hidden">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-hidden border-r border-line bg-surface sm:flex">
-        <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
-          <Image src="/logo.png" alt="" width={26} height={25} className="h-6.5 w-auto" />
-          <span className="font-semibold tracking-tight">
-            Nexa<span className="text-brand">Shopping</span>
-          </span>
+      <aside className="distributor-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-hidden sm:flex">
+        <div className="distributor-sidebar__brand"><div className="distributor-sidebar__logo"><Image src="/logo.png" alt="" width={26} height={25} /></div><div><span>Nexa<span>Shopping</span></span><small>Distributor workspace</small></div>
         </div>
-        <nav className="flex-1 space-y-0.5 p-3">
+        <nav className="distributor-sidebar__nav">
+          <p className="distributor-sidebar__label">Workspace</p>
           {NAV.map((item) => {
             const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -88,9 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  active ? "bg-brand/10 text-brand" : "text-ink-soft hover:bg-canvas hover:text-ink"
-                }`}
+                className={`distributor-sidebar__link ${active ? "is-active" : ""}`}
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
@@ -98,9 +94,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
-        <div className="mt-auto space-y-2 border-t border-line p-3">
-          <Link href="/dashboard/customers" className="flex h-10 items-center justify-center gap-2 rounded-lg bg-brand px-3.5 text-[13px] font-medium text-white shadow-sm transition hover:bg-brand-strong"><CartPlus className="h-4 w-4" />New Order</Link>
-          <button type="button" onClick={() => setLogoutConfirmOpen(true)} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-medium text-red-600 transition hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
+        <div className="distributor-sidebar__footer">
+          <Link href="/dashboard/customers" className="distributor-sidebar__new-order"><CartPlus className="h-4 w-4" />New order<ArrowRight className="h-4 w-4" /></Link>
+          <div className="distributor-sidebar__account"><Link href="/dashboard/profile" className="distributor-sidebar__account-avatar">{profileInitial}</Link><Link href="/dashboard/profile" className="distributor-sidebar__account-copy"><strong>{displayName}</strong><small>View profile</small></Link><button type="button" onClick={() => setLogoutConfirmOpen(true)} aria-label="Log out"><Close className="h-4 w-4" /></button></div>
         </div>
       </aside>
 
@@ -119,19 +115,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <Drawer.Portal>
                 <Drawer.Overlay className="fixed inset-0 z-40 bg-black/25" />
-                <Drawer.Content id="distributor-mobile-nav" className="fixed inset-y-0 left-0 z-50 flex h-screen w-[min(82vw,320px)] flex-col overflow-hidden border-r border-line bg-surface px-4 py-5 shadow-2xl outline-none">
+                <Drawer.Content id="distributor-mobile-nav" className="distributor-mobile-drawer fixed inset-y-0 left-0 z-50 flex h-screen w-[min(82vw,320px)] flex-col overflow-hidden px-4 py-5 shadow-2xl outline-none">
                   <Drawer.Title className="sr-only">Distributor navigation</Drawer.Title>
-                  <div className="mb-6 flex items-center justify-between border-b border-line pb-4"><span className="font-semibold">Navigation</span><Drawer.Close asChild><button type="button" className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-canvas" aria-label="Close navigation"><Close className="h-5 w-5" /></button></Drawer.Close></div>
-                  <nav className="grid gap-1">
+                  <div className="distributor-mobile-drawer__head"><div><strong>Nexa<span>Shopping</span></strong><small>Distributor workspace</small></div><Drawer.Close asChild><button type="button" aria-label="Close navigation"><Close className="h-5 w-5" /></button></Drawer.Close></div>
+                  <nav className="distributor-sidebar__nav distributor-sidebar__nav--mobile"><p className="distributor-sidebar__label">Workspace</p>
                     {NAV.map((item) => {
                       const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
                       const Icon = item.icon;
-                      return <Drawer.Close key={item.href} asChild><Link href={item.href} className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium ${active ? "bg-brand/10 text-brand" : "text-ink-soft hover:bg-canvas hover:text-ink"}`}><Icon className="h-5 w-5" />{item.label}</Link></Drawer.Close>;
+                      return <Drawer.Close key={item.href} asChild><Link href={item.href} className={`distributor-sidebar__link ${active ? "is-active" : ""}`}><Icon className="h-5 w-5" />{item.label}</Link></Drawer.Close>;
                     })}
                   </nav>
-                  <div className="mt-8 space-y-2 border-t border-line pt-5">
-                    <Drawer.Close asChild><Link href="/dashboard/customers" className="flex h-10 items-center justify-center gap-2 rounded-lg bg-brand px-3.5 text-[13px] font-medium text-white shadow-sm"><CartPlus className="h-4 w-4" />New Order</Link></Drawer.Close>
-                    <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-200 px-4 text-sm font-medium text-red-600 hover:bg-red-50"><Close className="h-4 w-4" />Log out</button>
+                  <div className="distributor-sidebar__footer distributor-sidebar__footer--mobile">
+                    <Drawer.Close asChild><Link href="/dashboard/customers" className="distributor-sidebar__new-order"><CartPlus className="h-4 w-4" />New order<ArrowRight className="h-4 w-4" /></Link></Drawer.Close>
+                    <button type="button" onClick={() => { setMobileMenuOpen(false); setLogoutConfirmOpen(true); }} className="distributor-sidebar__logout"><Close className="h-4 w-4" />Log out</button>
                   </div>
                 </Drawer.Content>
               </Drawer.Portal>

@@ -6,8 +6,9 @@ import { useSales, type OrderFilters } from "@/features/orders/api";
 import { formatMoney } from "@/lib/money";
 import { Button, EmptyState, ErrorState, Select, Spinner } from "@/components/ui";
 import type { OrderStatus } from "@/lib/types";
+import { SalesAnalytics } from "@/features/orders/sales-analytics";
 
-export default function SalesPage() {
+function LegacySalesPage() {
   const [filters, setFilters] = useState<OrderFilters>({});
   const [cursors, setCursors] = useState<string[]>([]);
   const cursor = cursors.at(-1);
@@ -37,3 +38,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+export default SalesAnalytics;
