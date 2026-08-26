@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Card, ErrorState, Spinner } from "@/components/ui";
+import { PhonePeMark } from "@/components/phonepe-mark";
 import { useOrderPaymentStatus, useReturnPaymentStatus } from "@/features/orders/api";
 import { useAuth } from "@/lib/auth-context";
 
@@ -22,7 +23,7 @@ export function ContinuePhonePePayment({ orderId }: { orderId: string }) {
     }
     await Promise.all([queryClient.invalidateQueries({ queryKey: ["order", orderId] }), queryClient.invalidateQueries({ queryKey: ["orders"] })]);
   }
-  return <Card className="p-4"><p className="text-sm font-medium">PhonePe payment pending</p><p className="mt-1 text-sm text-ink-soft">Verify the latest provider status before reopening PhonePe.</p>{error && <p className="mt-2 text-sm text-red-600">{error}</p>}<Button className="mt-3" onClick={continuePayment} disabled={query.isFetching}>{query.isFetching ? "Checking payment…" : "Check or continue payment"}</Button></Card>;
+  return <Card className="p-4"><div className="flex items-center gap-2"><PhonePeMark className="h-4 w-auto" /><p className="text-sm font-medium">Payment pending</p></div><p className="mt-1 text-sm text-ink-soft">Verify the latest provider status before reopening PhonePe.</p>{error && <p className="mt-2 text-sm text-red-600">{error}</p>}<Button className="mt-3" onClick={continuePayment} disabled={query.isFetching}>{query.isFetching ? "Checking payment…" : "Check or continue payment"}</Button></Card>;
 }
 
 export function PhonePePaymentResponse({ merchantOrderId }: { merchantOrderId?: string }) {
@@ -52,5 +53,5 @@ export function PhonePePaymentResponse({ merchantOrderId }: { merchantOrderId?: 
     return <ErrorState message={message} onRetry={() => { void paymentQuery.refetch(); }} />;
   }
   if (payment && isPending) return <Card className="p-5"><div className="flex items-center gap-3"><Spinner className="h-5 w-5 text-brand" /><div><p className="text-sm font-medium">Payment processing</p><p className="text-sm text-ink-soft">PhonePe has not confirmed this payment yet. We are checking securely with PhonePe.</p></div></div>{payment.redirectUrl?.startsWith("https://") && <Button className="mt-4" onClick={() => window.location.assign(payment.redirectUrl!)}>Reopen PhonePe</Button>}{pollCount >= 10 && <p className="mt-3 text-xs text-ink-soft">Still waiting for confirmation. You can reopen the payment or return later; we will not create a duplicate payment.</p>}</Card>;
-  return <Card className="flex items-center gap-3 p-5"><Spinner className="h-5 w-5 text-brand" /><div><p className="text-sm font-medium">Verifying PhonePe payment</p><p className="text-sm text-ink-soft">Please keep this page open while the backend checks the provider result.</p></div></Card>;
+  return <Card className="flex items-center gap-3 p-5"><Spinner className="h-5 w-5 text-brand" /><div><div className="flex items-center gap-2"><p className="text-sm font-medium">Verifying payment</p><PhonePeMark className="h-3.5 w-auto" /></div><p className="text-sm text-ink-soft">Please keep this page open while the backend checks the provider result.</p></div></Card>;
 }

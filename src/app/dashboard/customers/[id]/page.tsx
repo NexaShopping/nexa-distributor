@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CustomerDetail } from "@/features/customers/customer-detail";
+import { CustomerDetailModern } from "@/features/customers/customer-detail";
 import { useCustomer } from "@/features/customers/api";
 import { ErrorState, Spinner } from "@/components/ui";
 
@@ -15,8 +14,7 @@ export default function CustomerDetailPage() {
 
   return (
     <div className="customer-detail-page mx-auto max-w-4xl">
-      <Link href="/dashboard/customers" className="text-sm text-ink-soft hover:text-ink">← Back to customers</Link>
-      <div className="mt-3"><CustomerDetail relationship={data.customer} /></div>
+      <CustomerDetailModern relationship={data.customer} />
     </div>
   );
 }

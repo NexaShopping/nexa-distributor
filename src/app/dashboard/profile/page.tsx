@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useAccount, useUpdateAccount } from "@/features/accounts/api";
 import { Button, Card, ErrorState, Input, Label, Spinner } from "@/components/ui";
+import { ProfileOverview } from "@/features/accounts/profile-overview";
 
-export default function ProfilePage() {
+function LegacyProfilePage() {
   const { account } = useAuth();
   const query = useAccount(account?.id ?? "");
   const update = useUpdateAccount(account?.id ?? "");
@@ -17,8 +19,11 @@ export default function ProfilePage() {
   if (query.isError || !profile) return <ErrorState message="Could not load your profile." onRetry={() => query.refetch()} />;
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <Card className="p-5 sm:p-7">
+    <div className="profile-modern mx-auto max-w-5xl">
+      <nav className="mb-4 flex items-center gap-2 text-sm text-ink-soft">
+        <Link href="/dashboard" className="hover:text-ink">Dashboard</Link><span>›</span><strong className="font-medium text-ink">Profile</strong>
+      </nav>
+      <Card className="profile-modern__card p-5 sm:p-7">
         <div className="mb-6 flex items-center gap-4">
           <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-full bg-brand/10 text-lg font-semibold text-brand">{avatarUrl ? <img src={avatarUrl} alt="" className="h-full w-full object-cover" /> : (name || profile.phone || "D").slice(0, 1).toUpperCase()}</div>
           <div><h1 className="text-lg font-semibold">Profile details</h1><p className="mt-1 text-sm text-ink-soft">Update the details shown across your distributor workspace.</p></div>
@@ -32,4 +37,10 @@ export default function ProfilePage() {
       </Card>
     </div>
   );
+}
+
+export default function ProfilePage() {
+  const { account } = useAuth();
+  if (!account) return <div className="grid place-items-center py-20 text-ink-soft"><Spinner className="h-5 w-5" /></div>;
+  return <ProfileOverview account={account} />;
 }

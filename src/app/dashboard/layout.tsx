@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/ui";
 import { ToastProvider } from "@/components/feedback";
-import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Search, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
+import { Bars, CartPlus, ChartPie, Close, Cog, ClipboardList, Home, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
 import { Drawer } from "vaul";
 
 const NAV = [
@@ -48,23 +48,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
-  const [globalSearch, setGlobalSearch] = useState("");
   const pageHeader = getPageHeader(pathname);
   const displayName = account?.name?.trim() || account?.phone || "Distributor";
   const profileInitial = displayName.charAt(0).toUpperCase();
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const value = globalSearch.trim();
-      if (!value) {
-        if (window.location.search.includes("q=")) router.replace(pathname);
-        return;
-      }
-      const target = pathname.startsWith("/dashboard/inventory") ? "/dashboard/inventory" : pathname.startsWith("/dashboard/customers") ? "/dashboard/customers" : "/dashboard/buy";
-      router.replace(`${target}?q=${encodeURIComponent(value)}`);
-    }, 300);
-    return () => window.clearTimeout(timer);
-  }, [globalSearch, pathname, router]);
 
   useEffect(() => {
     if (status === "anon") router.replace("/login");
@@ -156,18 +142,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
-            <label className="hidden h-9 w-52 items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-ink-soft focus-within:border-brand sm:flex">
-              <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
-            </label>
             <Link href="/dashboard/profile" aria-label={`Open profile for ${displayName}`} title={displayName} className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-brand/10 text-sm font-semibold text-brand transition hover:ring-2 hover:ring-brand/20">
               {account?.avatarUrl ? <img src={account.avatarUrl} alt="" className="h-full w-full object-cover" /> : profileInitial}
             </Link>
           </div>
-          <label className="flex h-9 basis-full items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-ink-soft focus-within:border-brand sm:hidden">
-            <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <input className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-ink-soft/70" aria-label="Search workspace" placeholder="Search workspace…" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} />
-          </label>
         </header>
         <main className="w-full min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-6">{children}</main>
       </div>

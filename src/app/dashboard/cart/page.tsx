@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePrimaryAdmin } from "@/features/admin/api";
@@ -39,7 +40,9 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-xl font-semibold">Your cart</h1>
+      <nav className="flex items-center gap-2 text-sm text-ink-soft">
+        <Link href="/dashboard" className="hover:text-ink">Dashboard</Link><span>›</span><strong className="font-medium text-ink">Cart</strong>
+      </nav>
 
       {cart.items.length === 0 ? (
         <div className="mt-5">

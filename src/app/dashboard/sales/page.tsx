@@ -17,7 +17,9 @@ export default function SalesPage() {
 
   return (
     <div className="reports-page mx-auto max-w-5xl">
-      <div className="reports-heading"><h1 className="text-xl font-semibold">Reports &amp; analytics</h1><p className="mt-1 text-sm text-ink-soft">Track customer sales fulfilled from your inventory.</p></div>
+      <nav className="reports-heading flex items-center gap-2 text-sm text-ink-soft">
+        <Link href="/dashboard" className="hover:text-ink">Dashboard</Link><span>›</span><strong className="font-medium text-ink">Sales</strong>
+      </nav>
       <Select
         className="reports-filter mt-5 sm:w-48"
         value={filters.status ?? ""}

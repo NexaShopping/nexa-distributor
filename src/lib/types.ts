@@ -78,6 +78,9 @@ export interface AccountSummary {
   avatarUrl: string | null;
   role: Role;
   status: AccountStatus;
+  createdAt: string;
+  lastLoginAt: string | null;
+  distributor: { businessName: string; referralCode: string; territory: string | null; onboardedAt: string | null } | null;
 }
 
 // --- Inventory / storefront browsing (from API.md · GET /inventory?sellerAccountId=) ---
