@@ -13,7 +13,7 @@ export default function CustomerDetailPage() {
   if (isError || !data) return <ErrorState message={error instanceof Error ? error.message : "Could not load this customer"} onRetry={refetch} />;
 
   return (
-    <div className="customer-detail-page mx-auto max-w-4xl">
+    <div className="customer-detail-page w-full max-w-none">
       <CustomerDetailModern relationship={data.customer} />
     </div>
   );

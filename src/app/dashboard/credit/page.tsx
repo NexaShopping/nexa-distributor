@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api, ApiError } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
-import { Button, ErrorState, Input, Spinner } from "@/components/ui";
+import { Button, ErrorState, Input, Select, Spinner } from "@/components/ui";
 import { PhonePeMark } from "@/components/phonepe-mark";
 import { useCreditCharges, useCreditLedger, useCreditRepayments, useCreditSummary, useStartCreditRepayment } from "@/features/credit/api";
 
@@ -168,17 +168,18 @@ function LedgerExport({ accountId }: { accountId: string }) {
   const todayIso = new Date().toISOString().slice(0, 10);
   const [from, setFrom] = useState(new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
   const [to, setTo] = useState(todayIso);
+  const [format, setFormat] = useState<"csv" | "pdf">("csv");
   const [exporting, setExporting] = useState(false);
 
   async function exportLedger() {
     if (exporting || from > to || !accountId) return;
     setExporting(true);
     try {
-      const blob = await api.download(`/credit/${accountId}/ledger/export?from=${from}&to=${to}`);
+      const blob = await api.download(`/credit/${accountId}/ledger/export?from=${from}&to=${to}&format=${format}`);
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `credit-ledger-${from}-to-${to}.csv`;
+      anchor.download = `credit-ledger-${from}-to-${to}.${format}`;
       anchor.click();
       URL.revokeObjectURL(url);
     } catch { /* error already surfaced globally */ }
@@ -189,7 +190,8 @@ function LedgerExport({ accountId }: { accountId: string }) {
     <div className="credit-modern__export">
       <label>From<input type="date" value={from} max={to} onChange={(event) => setFrom(event.target.value)} aria-label="Ledger export from date" /></label>
       <label>To<input type="date" value={to} min={from} max={todayIso} onChange={(event) => setTo(event.target.value)} aria-label="Ledger export to date" /></label>
-      <Button size="sm" variant="secondary" onClick={exportLedger} disabled={exporting || from > to}>{exporting ? "Exporting…" : "Export CSV"}</Button>
+      <Select aria-label="Ledger export format" value={format} onChange={(event) => setFormat(event.target.value as "csv" | "pdf")}><option value="csv">CSV</option><option value="pdf">PDF</option></Select>
+      <Button size="sm" variant="secondary" onClick={exportLedger} disabled={exporting || from > to}>{exporting ? "Exporting…" : "Export"}</Button>
     </div>
   );
 }
