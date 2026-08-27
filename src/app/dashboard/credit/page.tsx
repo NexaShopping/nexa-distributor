@@ -55,7 +55,7 @@ export default function CreditPage() {
 
       <div className="credit-modern__metrics">
         {metricData.map(([label, value, detail, icon, tone]) => (
-          <div className="credit-modern__metric" key={label}>
+          <div className={`credit-modern__metric credit-modern__metric--${tone}`} key={label}>
             <div>
               <p>{label}</p>
               <strong className={tone === "red" ? "danger" : ""}>{value}</strong>

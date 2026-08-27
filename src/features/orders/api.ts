@@ -9,11 +9,13 @@ import type { Invoice, Order, OrderAddress, OrderCheckoutPayment, OrderPaymentSt
 
 export interface OrderFilters {
   status?: OrderStatus;
+  limit?: number;
 }
 
 export function useOrders(filters: OrderFilters, cursor?: string) {
   const params = new URLSearchParams({ role: "buyer" });
   if (filters.status) params.set("status", filters.status);
+  if (filters.limit) params.set("limit", String(filters.limit));
   if (cursor) params.set("cursor", cursor);
   return useQuery({
     queryKey: ["orders", filters, cursor],
@@ -25,6 +27,7 @@ export function useOrders(filters: OrderFilters, cursor?: string) {
 export function useSales(filters: OrderFilters, cursor?: string) {
   const params = new URLSearchParams({ role: "seller" });
   if (filters.status) params.set("status", filters.status);
+  if (filters.limit) params.set("limit", String(filters.limit));
   if (cursor) params.set("cursor", cursor);
   return useQuery({
     queryKey: ["sales", filters, cursor],

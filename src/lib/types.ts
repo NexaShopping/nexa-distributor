@@ -120,6 +120,17 @@ export interface StockLedgerEntry {
   createdAt: string;
 }
 
+export interface RecentLedgerEntry {
+  id: string;
+  createdAt: string;
+  sku: string;
+  productName: string;
+  reason: string;
+  delta: number;
+  onHandAfter: number;
+  reservedAfter: number;
+}
+
 export interface UpdateStockItemBody {
   sellPrice?: string;
   discountPrice?: string | null;

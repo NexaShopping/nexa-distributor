@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type {
   AdjustStockBody,
+  RecentLedgerEntry,
   RetailPriceRange,
   StockItemView,
   StockLedgerEntry,
@@ -74,5 +75,14 @@ export function useLedger(id: string, cursor?: string) {
     queryKey: ["ledger", id, cursor],
     queryFn: () => api.getPage<{ entries: StockLedgerEntry[] }>(`/inventory/${id}/ledger${qs}`),
     enabled: Boolean(id),
+  });
+}
+
+// The dashboard's "Recent stock history" widget — last few movements across every item, not
+// one item's full ledger.
+export function useRecentLedger(limit = 3) {
+  return useQuery({
+    queryKey: ["recent-ledger", limit],
+    queryFn: () => api.get<{ entries: RecentLedgerEntry[] }>(`/inventory/ledger/recent?limit=${limit}`),
   });
 }

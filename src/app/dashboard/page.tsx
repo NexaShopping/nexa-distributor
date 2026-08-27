@@ -105,7 +105,7 @@ export default function DashboardPage(_props: Readonly<DashboardPageProps>) {
 interface KpiCardProps { label: string; value: string; detail: string; tone: "brand" | "success" | "danger" | "warning"; href: string }
 function KpiCard({ label, value, detail, tone, href }: Readonly<KpiCardProps>) {
   const art = label === "Inventory health" ? "inventory" : label === "Open orders" ? "orders" : label === "Customers" ? "customers" : "payable";
-  return <Link href={href} className={`dashboard-v2-kpi dashboard-v2-kpi-${art}`}><img className="dashboard-v2-kpi-art dashboard-v2-kpi-art-desktop" src={`/dashboard/kpi-${art}-desktop.png`} alt="" aria-hidden="true" /><img className="dashboard-v2-kpi-art dashboard-v2-kpi-art-mobile" src={`/dashboard/kpi-${art}-mobile.png`} alt="" aria-hidden="true" /><div className="dashboard-v2-kpi-top"><span>{label}</span></div><strong>{value}</strong><small className={tone}>{detail}</small></Link>;
+  return <Link href={href} className={`dashboard-v2-kpi dashboard-v2-kpi-${art} dashboard-v2-kpi--${tone}`}><img className="dashboard-v2-kpi-art dashboard-v2-kpi-art-desktop" src={`/dashboard/kpi-${art}-desktop.png`} alt="" aria-hidden="true" /><img className="dashboard-v2-kpi-art dashboard-v2-kpi-art-mobile" src={`/dashboard/kpi-${art}-mobile.png`} alt="" aria-hidden="true" /><div className="dashboard-v2-kpi-top"><span>{label}</span></div><strong>{value}</strong><small className={tone}>{detail}</small></Link>;
 }
 
 interface SalesChartProps { values: number[]; loading: boolean }

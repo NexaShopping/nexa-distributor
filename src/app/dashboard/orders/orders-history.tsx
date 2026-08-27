@@ -92,7 +92,7 @@ export default function OrdersHistory() {
   return (
     <section className="orders-history" aria-labelledby="orders-title">
       <div className="orders-history__crumb"><Link href="/dashboard">Dashboard</Link><span>›</span><strong>Orders</strong></div>
-      <div className="orders-history__metrics">{metricCards.map((card) => <div className="orders-history__metric" key={card.label}><div className={"orders-history__metric-icon orders-history__metric-icon--" + card.tone}><Icon name={card.icon} /></div><div><p>{card.label}</p><strong>{isLoading ? "—" : card.value}</strong><span>{card.detail}</span></div></div>)}</div>
+      <div className="orders-history__metrics">{metricCards.map((card) => <div className={"orders-history__metric orders-history__metric--" + card.tone} key={card.label}><div className={"orders-history__metric-icon orders-history__metric-icon--" + card.tone}><Icon name={card.icon} /></div><div><p>{card.label}</p><strong>{isLoading ? "—" : card.value}</strong><span>{card.detail}</span></div></div>)}</div>
       <div className="orders-history__toolbar">
         <label className="orders-history__search"><Icon name="search" /><span className="sr-only">Search orders</span><input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search by order ID or product" /></label>
         <select aria-label="Filter by status" value={filters.status ?? ""} onChange={(event) => updateStatus(event.target.value)}><option value="">All statuses</option><option value="AWAITING_PAYMENT">Awaiting payment</option><option value="CONFIRMED">Confirmed</option><option value="SHIPPED">Shipped</option><option value="DELIVERED">Delivered</option><option value="CANCELLED">Cancelled</option></select>

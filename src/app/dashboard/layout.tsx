@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/ui";
 import { usePrimaryAdmin } from "@/features/admin/api";
-import { useCart, useUpdateCartItem } from "@/features/cart/api";
+import { useCart, useRemoveCartItem, useUpdateCartItem } from "@/features/cart/api";
 import { formatMoney } from "@/lib/money";
 import { ToastProvider } from "@/components/feedback";
 import { Bars, CartPlus, ChartPie, Close, Cog, Home, Store, User, Users, Wallet } from "flowbite-react-icons/outline";
@@ -161,9 +162,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function CartHeader({ cart, sellerAccountId, open, onToggle, onClose }: { cart?: import("@/lib/types").CartView; sellerAccountId: string; open: boolean; onToggle: () => void; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const updateCart = useUpdateCartItem(sellerAccountId);
+  const removeCart = useRemoveCartItem(sellerAccountId);
+  const qc = useQueryClient();
+  const [clearing, setClearing] = useState(false);
   useEffect(() => { if (!open) return; const close = (event: MouseEvent) => { if (ref.current && !ref.current.contains(event.target as Node)) onClose(); }; document.addEventListener("mousedown", close); return () => document.removeEventListener("mousedown", close); }, [open, onClose]);
   const count = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
-  return <div className="header-cart" ref={ref}><button type="button" className="header-cart__button" aria-label={`Cart, ${count} items`} aria-expanded={open} onClick={onToggle}><CartPlus className="h-4 w-4" />{count > 0 && <span>{count > 99 ? "99+" : count}</span>}</button>{open && <div className="header-cart__popover"><div className="header-cart__head"><div><strong>Your cart</strong><small>{count} {count === 1 ? "item" : "items"}</small></div><Link href="/dashboard/cart" onClick={onClose}>View cart</Link></div>{cart?.items.length ? <div className="header-cart__items">{cart.items.map((item) => <div className="header-cart__item" key={item.id}><div className="header-cart__item-copy"><strong>{item.name}</strong><small>{item.sku}</small><div className="header-cart__quantity"><button type="button" aria-label={`Decrease ${item.name} quantity`} disabled={updateCart.isPending || item.quantity <= 1} onClick={() => void updateCart.mutateAsync({ id: item.id, quantity: item.quantity - 1 })}>−</button><span>{item.quantity}</span><button type="button" aria-label={`Increase ${item.name} quantity`} disabled={updateCart.isPending || item.quantity >= item.available} onClick={() => void updateCart.mutateAsync({ id: item.id, quantity: item.quantity + 1 })}>+</button></div></div><b>{formatMoney(item.lineTotal)}</b></div>)}</div> : <div className="header-cart__empty">Your cart is empty.<Link href="/dashboard/buy" onClick={onClose}>Browse shopping</Link></div>}{cart?.items.length ? <div className="header-cart__total"><span>Subtotal</span><strong>{formatMoney(cart.subtotal)}</strong></div> : null}</div>}</div>;
+
+  async function clearCart() {
+    if (!cart?.items.length || clearing) return;
+    if (!window.confirm("Remove all items from your cart?")) return;
+    setClearing(true);
+    try {
+      await Promise.all(cart.items.map((item) => removeCart.mutateAsync(item.id)));
+      // Individual DELETE responses can land out of order once several fire in parallel — the
+      // cache may briefly reflect a stale intermediate state, so refetch to be sure it's right.
+      await qc.invalidateQueries({ queryKey: ["cart", sellerAccountId] });
+    } catch { /* error already surfaced globally */ }
+    finally { setClearing(false); }
+  }
+
+  return <div className="header-cart" ref={ref}><button type="button" className="header-cart__button" aria-label={`Cart, ${count} items`} aria-expanded={open} onClick={onToggle}><CartPlus className="h-4 w-4" />{count > 0 && <span>{count > 99 ? "99+" : count}</span>}</button>{open && <div className="header-cart__popover"><div className="header-cart__head"><div><strong>Your cart</strong><small>{count} {count === 1 ? "item" : "items"}</small></div><Link href="/dashboard/cart" onClick={onClose}>View cart</Link></div>{cart?.items.length ? <div className="header-cart__items">{cart.items.map((item) => <div className="header-cart__item" key={item.id}><div className="header-cart__item-copy"><strong>{item.name}</strong><small>{item.sku}</small><div className="header-cart__quantity"><button type="button" aria-label={`Decrease ${item.name} quantity`} disabled={updateCart.isPending || item.quantity <= 1} onClick={() => void updateCart.mutateAsync({ id: item.id, quantity: item.quantity - 1 })}>−</button><span>{item.quantity}</span><button type="button" aria-label={`Increase ${item.name} quantity`} disabled={updateCart.isPending || item.quantity >= item.available} onClick={() => void updateCart.mutateAsync({ id: item.id, quantity: item.quantity + 1 })}>+</button></div></div><div className="header-cart__item-right"><b>{formatMoney(item.lineTotal)}</b><button type="button" className="header-cart__remove" aria-label={`Remove ${item.name} from cart`} disabled={removeCart.isPending} onClick={() => void removeCart.mutateAsync(item.id)}><Close className="h-3.5 w-3.5" /></button></div></div>)}</div> : <div className="header-cart__empty">Your cart is empty.<Link href="/dashboard/buy" onClick={onClose}>Browse shopping</Link></div>}{cart?.items.length ? <div className="header-cart__total"><span>Subtotal</span><strong>{formatMoney(cart.subtotal)}</strong></div> : null}{cart?.items.length ? <button type="button" className="header-cart__clear" onClick={() => void clearCart()} disabled={clearing}>{clearing ? "Clearing…" : "Clear cart"}</button> : null}</div>}</div>;
 }
 
 function HomeIcon({ className }: { className?: string }) {

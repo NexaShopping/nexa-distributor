@@ -162,7 +162,7 @@ function CustomerStatusBadge({ status }: { status: DistributorCustomerStatus }) 
 }
 
 function CustomerMetric({ label, value, detail, icon, tone }: { label: string; value: number; detail: string; icon: CustomerIconName; tone: string }) {
-  return <div className="customers-modern__metric"><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div><i className={`customers-modern__metric-icon customers-modern__metric-icon--${tone}`}><CustomerIcon name={icon} /></i></div>;
+  return <div className={`customers-modern__metric customers-modern__metric--${tone}`}><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div><i className={`customers-modern__metric-icon customers-modern__metric-icon--${tone}`}><CustomerIcon name={icon} /></i></div>;
 }
 
 export default function CustomersModernPage() {
