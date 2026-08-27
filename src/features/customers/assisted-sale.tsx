@@ -11,10 +11,7 @@ import { useAddToCart, useCart, useRemoveCartItem, useUpdateCartItem } from "@/f
 import { AssistedCheckout } from "@/features/customers/assisted-checkout";
 import { Button, Card, EmptyState, ErrorState, Input, Spinner } from "@/components/ui";
 import type { CartLine, CustomerRelationship, StockItemView } from "@/lib/types";
-import "./assisted-sale-controls.css";
-import "./assisted-sale-toolbar-fix.css";
-import "./assisted-sale-alignment.css";
-import "./assisted-sale-alignment-final.css";
+import "./assisted-sale-toolbar.css";
 
 export function AssistedSale({ relationship }: { relationship: CustomerRelationship }) {
   const { account } = useAuth();

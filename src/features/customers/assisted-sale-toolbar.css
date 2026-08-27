@@ -1,0 +1,22 @@
+/* Search toolbar + filter chips + availability/sort selects for the assisted-sale product
+   picker. Mobile-first: everything is 100% width and stacks. At 761px+, the selects float to
+   the top-right of the search row instead of taking their own line — a single, explicit
+   breakpoint, no !important stacking, so nothing can leak a fixed desktop width onto mobile. */
+
+.assisted-sale-toolbar { width: 100%; margin-bottom: 8px; }
+.assisted-sale-toolbar input { height: 40px; border: 1px solid #eadfd8; border-radius: 9px; background: #fffdf9; box-shadow: none; font-family: Manrope, system-ui, sans-serif; font-size: 12px; }
+
+.assisted-sale-chips { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; }
+.assisted-sale-chips button { flex: 0 0 auto; height: 32px; padding: 0 12px; border: 1px solid #eadfd8; border-radius: 999px; background: #fffdf9; color: #76665e; font-family: Manrope, system-ui, sans-serif; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.assisted-sale-chips button.is-active { border-color: #f2751f; background: #f2751f; color: #fff; }
+
+.assisted-sale-selects { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin: 10px 0 0; }
+.assisted-sale-selects select { width: 100%; min-width: 0; height: 40px; box-sizing: border-box; border: 1px solid #eadfd8; border-radius: 9px; background: #fffdf9; color: #5b4a42; font-family: Manrope, system-ui, sans-serif; font-size: 11px; }
+
+@media (min-width: 761px) {
+  .assisted-sale-grid > section { position: relative; }
+  .assisted-sale-toolbar { width: calc(100% - 220px); margin-bottom: 0; }
+  .assisted-sale-chips { margin-top: 8px; }
+  .assisted-sale-selects { display: flex; position: absolute; top: 0; right: 0; width: 210px; height: 40px; margin: 0; }
+  .assisted-sale-selects select { flex: 1; min-width: 0; height: 40px; }
+}

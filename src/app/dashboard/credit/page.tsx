@@ -45,7 +45,7 @@ export default function CreditPage() {
   const metricData: Array<[string, string, string, IconName, string]> = [
     ["Available credit", credit ? formatMoney(credit.availableCredit) : "—", "Ready to spend", "wallet", "orange"],
     ["Outstanding balance", credit ? formatMoney(credit.currentBalance) : "—", "Currently owed", "chart", "amber"],
-    ["Credit limit", credit ? formatMoney(credit.creditLimit) : "—", "Set by admin", "shield", "green"],
+    ["Credit\nlimit", credit ? formatMoney(credit.creditLimit) : "—", "Set by admin", "shield", "green"],
     ["Next due", credit ? (credit.nextDueAt ? new Date(credit.nextDueAt).toLocaleDateString("en-IN") : "No active due") : "—", danger ? "Overdue — repay to unblock orders" : "On track", "clock", danger ? "red" : "orange"],
   ];
 

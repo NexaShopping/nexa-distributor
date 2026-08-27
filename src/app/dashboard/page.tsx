@@ -12,7 +12,18 @@ import { useCustomers } from "@/features/customers/api";
 import { useMyPayables } from "@/features/settlements/api";
 import { formatMoney } from "@/lib/money";
 import { Badge, Card, ErrorState, Spinner } from "@/components/ui";
-import type { Order, StockItemView } from "@/lib/types";
+import type { Order, OrderStatus, StockItemView } from "@/lib/types";
+
+// Mirrors STATUS_TONES in dashboard/orders/orders-history.tsx — same status vocabulary, same
+// pill classes (.orders-status--*), so a status reads the same tone here as it does everywhere
+// else in the app.
+const ACTIVITY_STATUS_TONE: Record<OrderStatus, "warning" | "brand" | "success" | "neutral"> = {
+  AWAITING_PAYMENT: "warning",
+  CONFIRMED: "brand",
+  SHIPPED: "brand",
+  DELIVERED: "success",
+  CANCELLED: "neutral",
+};
 
 const FALLBACK_SALES = [42, 58, 51, 74, 68, 92, 86, 108];
 
@@ -115,12 +126,18 @@ function QuickActions({ cartCount }: Readonly<QuickActionsProps>) {
 
 interface LowStockCardProps { items: StockItemView[]; loading: boolean }
 function LowStockCard({ items, loading }: Readonly<LowStockCardProps>) {
-  return <Card className="dashboard-v2-list-card"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Attention needed</p><h2>Low-stock alerts</h2></div><Link href="/dashboard/inventory" className="dashboard-v2-text-link">Review inventory</Link></div>{loading ? <div className="dashboard-v2-skeleton" /> : items.length ? <div className="dashboard-v2-stock-list">{items.map((item) => <Link href={`/dashboard/inventory/${item.id}`} key={item.id}><span className="dashboard-v2-stock-icon"><ClipboardList className="h-5 w-5" /></span><span><strong>{item.variant.product.name}</strong><small>SKU: {item.variant.sku}</small></span><b>{item.available} left</b></Link>)}</div> : <p className="dashboard-v2-empty">No items need replenishment right now.</p>}</Card>;
+  return <Card className="dashboard-v2-list-card"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Attention needed</p><h2>Low-stock alerts</h2></div><Link href="/dashboard/inventory" className="dashboard-v2-text-link">Review inventory</Link></div>{loading ? <div className="dashboard-v2-skeleton" /> : items.length ? <div className="dashboard-v2-stock-list">{items.map((item) => {
+    const severity = item.available <= 0 ? "critical" : "low";
+    return <Link href={`/dashboard/inventory/${item.id}`} key={item.id}><span className={`dashboard-v2-stock-icon dashboard-v2-stock-icon--${severity}`}><ClipboardList className="h-5 w-5" /></span><span><strong>{item.variant.product.name}</strong><small>SKU: {item.variant.sku}</small></span><b className={`dashboard-v2-stock-badge dashboard-v2-stock-badge--${severity}`}>{item.available} left</b></Link>;
+  })}</div> : <p className="dashboard-v2-empty">No items need replenishment right now.</p>}</Card>;
 }
 
 interface ActivityCardProps { orders: Order[]; loading: boolean }
 function ActivityCard({ orders, loading }: Readonly<ActivityCardProps>) {
-  return <Card className="dashboard-v2-list-card"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Live feed</p><h2>Recent activity</h2></div><Bell className="h-5 w-5 text-brand" /></div>{loading ? <div className="dashboard-v2-skeleton" /> : orders.length ? <div className="dashboard-v2-activity">{orders.map((order) => <div key={order.id}><i /><span><strong>Order #{order.orderNo}</strong><small>{order.status.replaceAll("_", " ").toLowerCase()} · {relativeDate(order.placedAt)}</small></span></div>)}</div> : <p className="dashboard-v2-empty">Your latest order activity will appear here.</p>}</Card>;
+  return <Card className="dashboard-v2-list-card"><div className="dashboard-v2-card-head"><div><p className="dashboard-v2-kicker">Live feed</p><h2>Recent activity</h2></div><span className="dashboard-v2-activity-bell"><Bell className="h-4 w-4" /></span></div>{loading ? <div className="dashboard-v2-skeleton" /> : orders.length ? <div className="dashboard-v2-activity">{orders.map((order) => {
+    const tone = ACTIVITY_STATUS_TONE[order.status];
+    return <div key={order.id}><i className={`dashboard-v2-activity-dot dashboard-v2-activity-dot--${tone}`} /><span className="dashboard-v2-activity-copy"><strong>Order #{order.orderNo}</strong></span><span className="dashboard-v2-activity-meta"><span className={`orders-status orders-status--${tone}`}>{order.status.replaceAll("_", " ").toLowerCase()}</span><small>{relativeDate(order.placedAt)}</small></span></div>;
+  })}</div> : <p className="dashboard-v2-empty">Your latest order activity will appear here.</p>}</Card>;
 }
 
 function relativeDate(value: string) { const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86400000)); return days === 0 ? "Today" : `${days}d ago`; }

@@ -12,9 +12,5 @@ export default function CustomerDetailPage() {
   if (isLoading) return <div className="grid place-items-center py-20 text-ink-soft"><Spinner className="h-5 w-5" /></div>;
   if (isError || !data) return <ErrorState message={error instanceof Error ? error.message : "Could not load this customer"} onRetry={refetch} />;
 
-  return (
-    <div className="customer-detail-page w-full max-w-none">
-      <CustomerDetailModern relationship={data.customer} />
-    </div>
-  );
+  return <CustomerDetailModern relationship={data.customer} />;
 }

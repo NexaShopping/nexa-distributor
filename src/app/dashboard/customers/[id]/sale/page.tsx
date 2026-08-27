@@ -15,7 +15,7 @@ export default function AssistedSalePage() {
   if (customer.data.customer.status !== "ACTIVE") return <ErrorState message="This customer relationship is blocked. Activate it before starting a sale." />;
 
   return (
-    <div className="assisted-sale-page mx-auto max-w-7xl">
+    <div className="assisted-sale-page">
       <Link href={`/dashboard/customers/${id}`} className="text-sm text-ink-soft hover:text-ink">← Back to customer</Link>
       <AssistedSale relationship={customer.data.customer} />
     </div>
