@@ -24,6 +24,7 @@ const NAV = [
   { href: "/dashboard/inventory", label: "Inventory", icon: StackIcon },
   { href: "/dashboard/orders", label: "Orders", icon: OrdersIcon },
   { href: "/dashboard/customers", label: "Customers", icon: Users },
+  { href: "/dashboard/diary", label: "Diary", icon: Wallet },
   { href: "/dashboard/settlements", label: "Payouts", icon: Wallet },
   { href: "/dashboard/sales", label: "Sales", icon: ChartPie },
   { href: "/dashboard/credit", label: "Credits", icon: Cog },
@@ -41,6 +42,7 @@ function getPageHeader(pathname: string) {
   if (pathname.startsWith("/dashboard/customers/") && pathname.endsWith("/sale")) return { title: "Assisted sale", description: "Create a sale for one of your customers." };
   if (pathname.startsWith("/dashboard/customers/")) return { title: "Customer details", description: "Review customer information and sale history." };
   if (pathname.startsWith("/dashboard/customers")) return { title: "Customers", description: "Your private customer list and assisted-sale relationships." };
+  if (pathname.startsWith("/dashboard/diary")) return { title: "Cash diary", description: "Submit collections for linked customers and track admin review." };
   if (pathname.startsWith("/dashboard/sales/")) return { title: "Sale details", description: "Review the customer sale and settlement status." };
   if (pathname.startsWith("/dashboard/sales")) return { title: "Sales", description: "Track customer sales fulfilled from your inventory." };
   if (pathname.startsWith("/dashboard/settlements")) return { title: "Settlements", description: "Track customer-sale proceeds released by NexaShopping." };

@@ -4,7 +4,11 @@
 
 export interface PageMeta {
   cursor?: string;
-  hasMore: boolean;
+  hasMore?: boolean;
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
 }
 
 export interface ApiSuccess<T> {
