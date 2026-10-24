@@ -3,7 +3,6 @@ import {
   getAuth,
   GoogleAuthProvider,
   sendEmailVerification,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -38,10 +37,6 @@ export async function firebasePasswordToken(email: string, password: string): Pr
 export async function firebaseGoogleToken(): Promise<string> {
   const credential = await signInWithPopup(auth, googleProvider);
   return credential.user.getIdToken();
-}
-
-export async function firebaseResetPassword(email: string): Promise<void> {
-  await sendPasswordResetEmail(auth, email);
 }
 
 export async function firebaseSignOut(): Promise<void> {

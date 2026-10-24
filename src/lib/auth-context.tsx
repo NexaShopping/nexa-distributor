@@ -10,7 +10,7 @@ import {
 } from "react";
 import { api } from "./api";
 import { tokenStore } from "./auth-store";
-import { firebaseGoogleToken, firebasePasswordToken, firebaseResetPassword, firebaseSignOut } from "./firebase";
+import { firebaseGoogleToken, firebasePasswordToken, firebaseSignOut } from "./firebase";
 import type { AuthAccount, DistributorLoginResponse, MeResponse } from "./types";
 
 type Status = "loading" | "authed" | "anon";
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [exchangeToken]);
 
   const resetPassword = useCallback(async (email: string) => {
-    await firebaseResetPassword(email);
+    await api.post("/auth/distributor/password-reset/request", { email });
   }, []);
 
   const logout = useCallback(async () => {

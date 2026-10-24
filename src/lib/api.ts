@@ -72,7 +72,9 @@ async function requestFull<T>(path: string, init: RequestInit = {}): Promise<{ d
     throw new ApiError(err.code, err.message, res.status, err.details);
   }
 
-  if (init.method && init.method !== "GET") emitApiEvent({ tone: "success", message: successMessage(path) });
+  if (init.method && init.method !== "GET" && path !== "/auth/distributor/password-reset/request") {
+    emitApiEvent({ tone: "success", message: successMessage(path) });
+  }
 
   return { data: body.data, meta: body.meta };
 }

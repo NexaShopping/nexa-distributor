@@ -38,6 +38,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
 
   useEffect(() => { if (status === "authed") router.replace("/dashboard"); }, [status, router]);
@@ -49,7 +50,7 @@ export default function LoginPage() {
   }
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault(); setBusy(true); setError(null);
+    e.preventDefault(); setBusy(true); setError(null); setNotice(null);
     try {
       await loginWithPassword(email.trim().toLowerCase(), password);
       router.replace("/dashboard");
@@ -58,7 +59,7 @@ export default function LoginPage() {
   }
 
   async function handleGoogle() {
-    setBusy(true); setError(null);
+    setBusy(true); setError(null); setNotice(null);
     try {
       await loginWithGoogle();
       router.replace("/dashboard");
@@ -67,18 +68,13 @@ export default function LoginPage() {
   }
 
   async function handleReset(e: React.FormEvent) {
-    e.preventDefault(); setBusy(true); setError(null);
+    e.preventDefault(); setBusy(true); setError(null); setNotice(null);
     try {
       await resetPassword(email.trim().toLowerCase());
-      setToast({ type: "success", message: "If this email has a login, you will receive a password reset link shortly." });
+      setNotice("If this email belongs to a distributor account, a password reset link is on its way.");
       setMode("login");
-    } catch (err) {
-      const value = err && typeof err === "object" ? err as { code?: string; message?: string } : {};
-      if (value.code === "auth/user-not-found") {
-        setToast({ type: "success", message: authErrorMessage(value, "reset") });
-        setMode("login");
-      } else showError(err, "reset");
-    } finally { setBusy(false); }
+    } catch (err) { showError(err, "reset"); }
+    finally { setBusy(false); }
   }
 
   return (
@@ -87,28 +83,29 @@ export default function LoginPage() {
         <div className="mobile-login-art" aria-hidden="true" />
         <div className="login-card">
           <div className="brand-lockup"><BagMark /><span>Nexa<span className="brand-orange">Shopping</span></span></div>
-          <div className="login-kicker"><span className="store-icon"><StoreIcon /></span> Distributor Panel</div>
-          <h1>{mode === "reset" ? "Set your password" : "Welcome back"}</h1>
-          <p className="login-subtitle">{mode === "reset" ? "Enter the email your admin assigned to you. We'll send a secure password link." : "Sign in to manage stock, credit, and your ledger."}</p>
+          <div className="login-kicker"><span className="store-icon"><StoreIcon /></span> Distributor workspace</div>
+          <h1>{mode === "reset" ? "Reset your password" : "Sign in to your account"}</h1>
+          <p className="login-subtitle">{mode === "reset" ? "Enter the login email assigned by your NexaShopping admin. We’ll send you a secure reset link." : "Access your stock, customer accounts, credit, and ledger."}</p>
+          {notice && <p className="login-notice" role="status">{notice}</p>}
 
           {mode === "login" ? (
             <form onSubmit={handleLogin} className="login-form">
               <div className="login-text-field"><label htmlFor="login-email">Email address</label><input id="login-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required /></div>
               <div className="login-text-field"><label htmlFor="login-password">Password</label><input id="login-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required /></div>
               <button type="submit" disabled={busy || !email || !password}>{busy ? "Signing in…" : "Sign in"}</button>
-              <button type="button" className="link-button" disabled={busy} onClick={() => { setError(null); setMode("reset"); }}>Set or reset password</button>
+              <button type="button" className="link-button" disabled={busy} onClick={() => { setError(null); setNotice(null); setMode("reset"); }}>Reset password</button>
               <div className="button-divider" aria-hidden="true"><span>or</span></div>
-              <button type="button" className="google-button" disabled={busy} onClick={handleGoogle}><GoogleIcon /> Continue with Google</button>
+              <button type="button" className="google-button" disabled={busy} onClick={handleGoogle}><GoogleIcon /> Sign in with Google</button>
             </form>
           ) : (
             <form onSubmit={handleReset} className="login-form">
               <div className="login-text-field"><label htmlFor="reset-email">Email address</label><input id="reset-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required /></div>
-              <button type="submit" disabled={busy || !email}>{busy ? "Sending link…" : "Send password link"}</button>
+              <button type="submit" disabled={busy || !email}>{busy ? "Sending link…" : "Send reset link"}</button>
               <button type="button" className="link-button" disabled={busy} onClick={() => { setError(null); setMode("login"); }}>Back to sign in</button>
             </form>
           )}
           {error && <p className="login-error">{error}</p>}
-          <p className="login-help">No login email yet? Ask your NexaShopping admin to assign one.</p>
+          <p className="login-help">Don’t have a login email? Ask your NexaShopping admin to assign one.</p>
           <div className="secure-note"><span>♢</span> Secure access for approved distributors</div>
         </div>
       </section>
@@ -127,7 +124,7 @@ export default function LoginPage() {
             <div className="sparkline" />
           </span>
         </div>
-        <div className="hero-footer"><div><BoxIcon /><span><b>Live stock insights</b><small>Track inventory in real time</small></span></div><div><LedgerIcon /><span><b>Transparent ledger</b><small>Every transaction, in one place</small></span></div><div><span className="shield">✓</span><span><b>Secure & trusted</b><small>Bank-grade security</small></span></div></div>
+        <div className="hero-footer"><div><BoxIcon /><span><b>Live stock insights</b><small>Track inventory in real time</small></span></div><div><LedgerIcon /><span><b>Transparent ledger</b><small>Every transaction, in one place</small></span></div><div><span className="shield">✓</span><span><b>Secure access</b><small>For approved distributors</small></span></div></div>
       </section>
       {toast && <div className={`login-toast ${toast.type}`} role="status" aria-live="polite"><span>{toast.type === "success" ? "✓" : toast.type === "error" ? "!" : "i"}</span>{toast.message}<button type="button" aria-label="Dismiss notification" onClick={() => setToast(null)}>×</button></div>}
     </main>
