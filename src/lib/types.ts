@@ -44,7 +44,7 @@ export interface ApiFailure {
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
 
-// --- Auth (from API.md · POST /auth/otp/request, POST /auth/otp/verify, GET /auth/me) ---
+// --- Auth (from API.md · POST /auth/distributor/login, GET /auth/me) ---
 
 export type Role = "ADMIN" | "COADMIN" | "DISTRIBUTOR" | "CUSTOMER";
 export type AccountStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "CLOSED";
@@ -59,15 +59,10 @@ export interface AuthAccount {
   status: AccountStatus;
 }
 
-export interface OtpVerifyResponse {
+export interface DistributorLoginResponse {
   token: string;
   expiresAt: string;
   account: AuthAccount;
-}
-
-export interface OtpRequestResponse {
-  ok: true;
-  sent: boolean;
 }
 
 export interface MeResponse {

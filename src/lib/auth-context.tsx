@@ -10,15 +10,17 @@ import {
 } from "react";
 import { api } from "./api";
 import { tokenStore } from "./auth-store";
-import type { AuthAccount, MeResponse, OtpRequestResponse, OtpVerifyResponse } from "./types";
+import { firebaseGoogleToken, firebasePasswordToken, firebaseResetPassword, firebaseSignOut } from "./firebase";
+import type { AuthAccount, DistributorLoginResponse, MeResponse } from "./types";
 
 type Status = "loading" | "authed" | "anon";
 
 interface AuthContextValue {
   status: Status;
   account: AuthAccount | null;
-  requestOtp: (phone: string) => Promise<boolean>;
-  verifyOtp: (phone: string, otp: string) => Promise<void>;
+  loginWithPassword: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -47,16 +49,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
-  const requestOtp = useCallback(async (phone: string) => {
-    const result = await api.post<OtpRequestResponse>("/auth/otp/request", { phone });
-    return result.sent;
+  const exchangeToken = useCallback(async (idToken: string) => {
+    try {
+      const result = await api.post<DistributorLoginResponse>("/auth/distributor/login", { idToken });
+      tokenStore.set(result.token);
+      setAccount(result.account);
+      setStatus("authed");
+    } catch (error) {
+      await firebaseSignOut().catch(() => {});
+      throw error;
+    }
   }, []);
 
-  const verifyOtp = useCallback(async (phone: string, otp: string) => {
-    const result = await api.post<OtpVerifyResponse>("/auth/otp/verify", { phone, otp });
-    tokenStore.set(result.token);
-    setAccount(result.account);
-    setStatus("authed");
+  const loginWithPassword = useCallback(async (email: string, password: string) => {
+    await exchangeToken(await firebasePasswordToken(email, password));
+  }, [exchangeToken]);
+
+  const loginWithGoogle = useCallback(async () => {
+    await exchangeToken(await firebaseGoogleToken());
+  }, [exchangeToken]);
+
+  const resetPassword = useCallback(async (email: string) => {
+    await firebaseResetPassword(email);
   }, []);
 
   const logout = useCallback(async () => {
@@ -66,12 +80,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       /* revoking the session is best-effort; clear locally regardless */
     }
     tokenStore.clear();
+    await firebaseSignOut().catch(() => {});
     setAccount(null);
     setStatus("anon");
   }, []);
 
   return (
-    <AuthContext.Provider value={{ status, account, requestOtp, verifyOtp, logout }}>
+    <AuthContext.Provider value={{ status, account, loginWithPassword, loginWithGoogle, resetPassword, logout }}>
       {children}
     </AuthContext.Provider>
   );

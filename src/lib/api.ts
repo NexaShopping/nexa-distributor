@@ -9,6 +9,7 @@ export function subscribeApiEvents(listener: (event: ApiEvent) => void) {
 }
 function emitApiEvent(event: ApiEvent) { apiEventListeners.forEach((listener) => listener(event)); }
 function successMessage(path: string) {
+  if (path === "/auth/distributor/login") return "Signed in successfully.";
   if (path.includes("/cart")) return "Cart updated.";
   if (path.includes("/inventory")) return "Inventory updated.";
   if (path.includes("/accounts")) return "Profile updated.";

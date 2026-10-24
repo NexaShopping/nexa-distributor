@@ -2,13 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { ApiError } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { authErrorMessage } from "@/lib/auth-errors";
 import { useAuth } from "@/lib/auth-context";
-
-function toE164(local: string): string {
-  return `+91${local.replace(/\D/g, "")}`;
-}
 
 function BagMark() {
   return <Image src="/logo.png" alt="" width={48} height={47} className="h-11 w-auto" priority />;
@@ -35,66 +31,53 @@ function BoxIcon() {
 }
 
 export default function LoginPage() {
-  const { status, requestOtp, verifyOtp } = useAuth();
+  const { status, loginWithPassword, loginWithGoogle, resetPassword } = useAuth();
   const router = useRouter();
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
+  const [mode, setMode] = useState<"login" | "reset">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
-  const [remember, setRemember] = useState(true);
-  const [resendSeconds, setResendSeconds] = useState(0);
-  const otpInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (status === "authed") router.replace("/dashboard"); }, [status, router]);
-  useEffect(() => { if (step === "otp") otpInputRef.current?.focus(); }, [step]);
-  useEffect(() => { if (error) setToast({ type: "error", message: error }); }, [error]);
-  useEffect(() => {
-    if (resendSeconds <= 0) return;
-    const timer = window.setInterval(() => setResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
-    return () => window.clearInterval(timer);
-  }, [resendSeconds]);
 
-  async function handleSendCode(e: React.FormEvent) {
+  function showError(err: unknown, action: "login" | "reset" = "login") {
+    const message = authErrorMessage(err && typeof err === "object" ? err as { code?: string; message?: string } : {}, action);
+    setError(message);
+    setToast({ type: "error", message });
+  }
+
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setError(null);
     try {
-      const sent = await requestOtp(toE164(phone));
-      if (!sent) {
-        const message = "No active distributor account was found for this mobile number.";
-        setError(message); setToast({ type: "error", message }); return;
-      }
-      setStep("otp");
-      setResendSeconds(60);
-      setToast({ type: "success", message: "OTP sent successfully. Check your mobile." });
-    } catch (err) {
-      const message = err instanceof ApiError ? err.message : "Could not send the code. Try again.";
-      setError(message); setToast({ type: "error", message });
-    }
+      await loginWithPassword(email.trim().toLowerCase(), password);
+      router.replace("/dashboard");
+    } catch (err) { showError(err); }
     finally { setBusy(false); }
   }
 
-  async function handleResendCode() {
-    if (busy || resendSeconds > 0) return;
+  async function handleGoogle() {
     setBusy(true); setError(null);
     try {
-      const sent = await requestOtp(toE164(phone));
-      if (!sent) { setError("No active distributor account was found for this mobile number."); return; }
-      setResendSeconds(60);
-      setToast({ type: "success", message: "A new OTP was sent successfully." });
-    } catch (err) {
-      const message = err instanceof ApiError ? err.message : "Could not resend the code. Try again.";
-      setError(message); setToast({ type: "error", message });
-    } finally { setBusy(false); }
+      await loginWithGoogle();
+      router.replace("/dashboard");
+    } catch (err) { showError(err); }
+    finally { setBusy(false); }
   }
 
-  async function handleVerify(e: React.FormEvent) {
+  async function handleReset(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setError(null);
-    try { await verifyOtp(toE164(phone), otp); setToast({ type: "success", message: "Signed in successfully." }); setTimeout(() => router.replace("/dashboard"), 350); }
-    catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.code === "NOT_FOUND" ? "No distributor account found for this phone number." : err.code === "FORBIDDEN" ? "This account isn't active yet — contact NexaShopping support." : err.code === "UNAUTHENTICATED" ? "That code is incorrect." : err.message);
-      } else setError("Sign-in failed. Please try again.");
+    try {
+      await resetPassword(email.trim().toLowerCase());
+      setToast({ type: "success", message: "If this email has a login, you will receive a password reset link shortly." });
+      setMode("login");
+    } catch (err) {
+      const value = err && typeof err === "object" ? err as { code?: string; message?: string } : {};
+      if (value.code === "auth/user-not-found") {
+        setToast({ type: "success", message: authErrorMessage(value, "reset") });
+        setMode("login");
+      } else showError(err, "reset");
     } finally { setBusy(false); }
   }
 
@@ -105,27 +88,27 @@ export default function LoginPage() {
         <div className="login-card">
           <div className="brand-lockup"><BagMark /><span>Nexa<span className="brand-orange">Shopping</span></span></div>
           <div className="login-kicker"><span className="store-icon"><StoreIcon /></span> Distributor Panel</div>
-          <h1>Welcome back</h1>
-          <p className="login-subtitle">Sign in to manage stock, credit, and your ledger.</p>
+          <h1>{mode === "reset" ? "Set your password" : "Welcome back"}</h1>
+          <p className="login-subtitle">{mode === "reset" ? "Enter the email your admin assigned to you. We'll send a secure password link." : "Sign in to manage stock, credit, and your ledger."}</p>
 
-          {step === "phone" ? (
-            <form onSubmit={handleSendCode} className="login-form">
-              <div className="phone-field floating-field"><span>+91</span><input id="phone" type="tel" inputMode="numeric" autoComplete="tel-national" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder=" " required /><label htmlFor="phone">Mobile number</label></div>
-              <div className="remember-row"><label><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> <span>Remember me</span></label></div>
-              <button type="button" className="google-button" onClick={() => setToast({ type: "info", message: "Google sign-in is coming soon. Please continue with mobile OTP." })}><GoogleIcon /> Continue with Google</button>
+          {mode === "login" ? (
+            <form onSubmit={handleLogin} className="login-form">
+              <div className="login-text-field"><label htmlFor="login-email">Email address</label><input id="login-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required /></div>
+              <div className="login-text-field"><label htmlFor="login-password">Password</label><input id="login-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required /></div>
+              <button type="submit" disabled={busy || !email || !password}>{busy ? "Signing in…" : "Sign in"}</button>
+              <button type="button" className="link-button" disabled={busy} onClick={() => { setError(null); setMode("reset"); }}>Set or reset password</button>
               <div className="button-divider" aria-hidden="true"><span>or</span></div>
-              <button type="submit" disabled={busy || phone.length !== 10}>{busy ? "Sending…" : "Send code"}</button>
+              <button type="button" className="google-button" disabled={busy} onClick={handleGoogle}><GoogleIcon /> Continue with Google</button>
             </form>
           ) : (
-            <form onSubmit={handleVerify} className="login-form">
-              <p className="otp-hint">Enter the 6-digit code sent to +91 {phone}.</p>
-              <div className="otp-field floating-field"><input ref={otpInputRef} id="otp" type="text" inputMode="numeric" autoComplete="one-time-code" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder=" " required /><label htmlFor="otp">Verification code</label></div>
-              <button type="submit" disabled={busy || otp.length !== 6}>{busy ? "Verifying…" : "Verify & sign in"}</button>
-              <div className="resend-row"><span>{resendSeconds > 0 ? `Resend code in 0:${String(resendSeconds).padStart(2, "0")}` : "Didn't receive the code?"}</span><button type="button" className="resend-button" disabled={busy || resendSeconds > 0} onClick={handleResendCode}>Resend OTP</button></div>
-              <button type="button" className="link-button" onClick={() => { setStep("phone"); setOtp(""); setError(null); setResendSeconds(0); }}>Use a different number</button>
+            <form onSubmit={handleReset} className="login-form">
+              <div className="login-text-field"><label htmlFor="reset-email">Email address</label><input id="reset-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required /></div>
+              <button type="submit" disabled={busy || !email}>{busy ? "Sending link…" : "Send password link"}</button>
+              <button type="button" className="link-button" disabled={busy} onClick={() => { setError(null); setMode("login"); }}>Back to sign in</button>
             </form>
           )}
           {error && <p className="login-error">{error}</p>}
+          <p className="login-help">No login email yet? Ask your NexaShopping admin to assign one.</p>
           <div className="secure-note"><span>♢</span> Secure access for approved distributors</div>
         </div>
       </section>
